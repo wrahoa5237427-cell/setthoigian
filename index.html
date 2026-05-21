@@ -407,7 +407,7 @@
                     <!-- Add task form -->
                     <form id="task-form" onsubmit="addTask(event)" class="relative mb-5">
                         <input id="task-input" type="text" placeholder="Nhập mục tiêu khẩn cấp tiếp theo..." required class="w-full bg-slate-50 dark:bg-gray-950 border border-slate-300 dark:border-gray-900 focus:border-emerald-500/50 rounded-xl pl-4 pr-14 py-3.5 text-xs placeholder-slate-400 dark:placeholder-gray-500 focus:outline-none text-slate-800 dark:text-gray-100 font-medium transition-all">
-                        <button type="submit" class="absolute right-2 top-2 p-1.5 rounded-lg bg-white dark:bg-gray-900 hover:bg-slate-100 dark:hover:bg-gray-855 text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-gray-850 transition-all" title="Thêm nhiệm vụ">
+                        <button type="submit" class="absolute right-2 top-2 p-1.5 rounded-lg bg-white dark:bg-gray-900 hover:bg-slate-100 dark:hover:bg-gray-855 text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-gray-855 transition-all" title="Thêm nhiệm vụ">
                             <i data-lucide="plus" class="w-4.5 h-4.5"></i>
                         </button>
                     </form>
@@ -1494,11 +1494,21 @@
                 stats.modeDistribution[timerState.mode] += minutesAwarded;
             }
 
-            const currentHour = new Date().getHours();
+            // --- THUẬT TOÁN PHÂN BỔ GIỜ HỌC CHÍNH XÁC ---
+            const endTime = new Date();
+            const startTime = new Date(endTime.getTime() - (minutesAwarded * 60 * 1000));
+
             if (!stats.hourlyActivity || stats.hourlyActivity.length !== 24) {
                 stats.hourlyActivity = Array(24).fill(0);
             }
-            stats.hourlyActivity[currentHour] = (stats.hourlyActivity[currentHour] || 0) + minutesAwarded;
+
+            // Chạy ngược từng phút từ lúc bắt đầu học đến lúc kết thúc học để lưu vào đúng khung giờ
+            for (let i = 0; i < minutesAwarded; i++) {
+                const minutePoint = new Date(startTime.getTime() + (i * 60 * 1000));
+                const hourOfThisMinute = minutePoint.getHours();
+                stats.hourlyActivity[hourOfThisMinute] = (stats.hourlyActivity[hourOfThisMinute] || 0) + 1;
+            }
+            // --------------------------------------------
 
             const todayStr = getTodayDateString();
             stats.dailyActivity[todayStr] = (stats.dailyActivity[todayStr] || 0) + minutesAwarded;
@@ -1570,7 +1580,7 @@
                 li.className = `flex items-center justify-between p-3.5 rounded-xl border transition-all duration-300 bg-white dark:bg-gray-950/70 ${isSelected ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/5 shadow-[0_0_15px_rgba(16,185,129,0.05)]' : 'border-slate-200 dark:border-gray-900'}`;
                 li.innerHTML = `
                     <div class="flex items-center gap-3 flex-grow mr-2 max-w-[70%]">
-                        <button onclick="toggleTaskComplete('${t.id}')" class="w-5 h-5 rounded-md border flex items-center justify-center transition ${t.completed ? 'bg-emerald-500 border-emerald-400 text-white' : 'border-slate-300 dark:border-gray-805 hover:border-emerald-500/50'}" title="Đánh dấu hoàn thành">
+                        <button onclick="toggleTaskComplete('${t.id}')" class="w-5 h-5 rounded-md border flex items-center justify-center transition ${t.completed ? 'bg-emerald-500 border-emerald-400 text-white' : 'border-slate-300 dark:border-gray-855 hover:border-emerald-500/50'}" title="Đánh dấu hoàn thành">
                             ${t.completed ? '<i data-lucide="check" class="w-3.5 h-3.5 stroke-[4]"></i>' : ''}
                         </button>
                         <div class="flex flex-col">
