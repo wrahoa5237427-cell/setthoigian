@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusFlow — Tập Trung Tối Giản & Gamified</title>
+    <!-- Tailwind CSS with Dark Mode config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#030712',
+                        darkcard: 'rgba(3, 7, 18, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        .timer-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 999px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+        /* Custom Glowing Theme classes */
+        .glow-emerald {
+            box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.15);
+        }
+        .dark .glow-emerald {
+            box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.25);
+        }
+        .glow-blue {
+            box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.15);
+        }
+        .dark .glow-blue {
+            box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.25);
+        }
+        .glow-orange {
+            box-shadow: 0 0 25px -5px rgba(249, 115, 22, 0.15);
+        }
+        .dark .glow-orange {
+            box-shadow: 0 0 25px -5px rgba(249, 115, 22, 0.25);
+        }
+        /* Smoothest progress ring transitions */
+        .progress-transition {
+            transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s ease;
+        }
+        /* Bar chart animations */
+        .bar-grow {
+            animation: growUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            transform-origin: bottom;
+            transform: scaleY(0);
+        }
+        @keyframes growUp { to { transform: scaleY(1); } }
+        /* Floating Custom Tooltip style */
+        #heatmap-tooltip {
+            position: absolute;
+            pointer-events: none;
+            z-index: 9999;
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-darkbg text-slate-800 dark:text-gray-100 min-h-screen flex flex-col justify-between overflow-x-hidden relative pb-8">
+
+    <!-- Theme Initialization Script (Prevents flash) -->
+    <script>
+        const savedTheme = localStorage.getItem('focusflow_theme');
+        if (savedTheme === 'light') {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" class="pointer-events-none fixed inset-0 z-50 w-full h-full"></canvas>
+
+    <!-- Floating Tooltip for Heatmap -->
+    <div id="heatmap-tooltip" class="px-3 py-2 rounded-xl text-xs font-medium bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-800 shadow-xl transition-opacity duration-150 flex flex-col gap-0.5">
+        <span id="tooltip-date" class="text-slate-500 dark:text-gray-400 font-bold">12 thg 5, 2026</span>
+        <span id="tooltip-value" class="text-emerald-600 dark:text-emerald-400 font-extrabold">Chưa rèn luyện</span>
+    </div>
+
+    <!-- Top Navigation / Header -->
+    <header class="border-b border-slate-200 dark:border-gray-900 bg-white/70 dark:bg-gray-950/70 backdrop-blur-md py-4 px-6 sticky top-0 z-40 transition-colors duration-500">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <!-- Logo Section -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl border border-emerald-500/30 bg-emerald-100 dark:bg-emerald-950/20 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                    <i data-lucide="activity" class="w-5 h-5 text-emerald-600 dark:text-emerald-400 animate-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold tracking-tight text-slate-900 dark:text-gray-100 flex items-center gap-2">
+                        FocusFlow 
+                        <span class="text-[9px] bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Pro Edition</span>
+                    </h1>
+                    <p class="text-[10px] text-slate-500 dark:text-gray-400 uppercase tracking-widest font-semibold">Kỷ luật tự thân & Số hóa</p>
+                </div>
+            </div>
+
+            <!-- Real-time Clock, Streak & Levels -->
+            <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-5">
+                <!-- Theme Toggle -->
+                <button onclick="toggleTheme()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-gray-900/50 dark:hover:bg-gray-800 border border-slate-200 dark:border-gray-800 text-slate-500 dark:text-sky-300 transition-colors" title="Đổi giao diện">
+                    <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
+                </button>
+
+                <!-- NEW: Settings Cog Icon (Bánh răng cài đặt) -->
+                <button onclick="openSettingsModal()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-gray-900/50 dark:hover:bg-gray-800 border border-slate-200 dark:border-gray-800 text-slate-500 dark:text-gray-400 dark:hover:text-gray-200 transition-colors" title="Cấu hình hệ thống & Âm lượng">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                </button>
+
+                <!-- Vietnam Real-time Clock -->
+                <div class="hidden sm:flex items-center gap-2 bg-slate-100 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 px-3 py-1.5 rounded-xl">
+                    <i data-lucide="clock" class="w-4 h-4 text-sky-600 dark:text-sky-400 animate-spin" style="animation-duration: 8s;"></i>
+                    <span id="vietnam-clock" class="timer-font text-xs font-bold text-sky-700 dark:text-sky-300 tracking-wide">00:00:00</span>
+                </div>
+
+                <!-- Streak Counter -->
+                <div class="flex items-center gap-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 px-3.5 py-1.5 rounded-xl text-amber-600 dark:text-amber-400">
+                    <i data-lucide="flame" class="w-4 h-4 fill-amber-500 text-amber-500 animate-bounce"></i>
+                    <span id="streak-count" class="text-xs font-extrabold">0</span>
+                    <span class="text-[9px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-500">Ngày</span>
+                </div>
+
+                <!-- Level Rank Badge -->
+                <div class="flex items-center gap-3 bg-slate-100 dark:bg-gray-900/40 border border-slate-200 dark:border-gray-800 rounded-xl px-3.5 py-1.5">
+                    <div class="text-right">
+                        <div class="text-[8px] text-slate-500 dark:text-gray-400 uppercase font-bold tracking-wider">Cấp độ</div>
+                        <div id="user-rank" class="text-xs font-bold text-emerald-600 dark:text-emerald-400">Tập Sự</div>
+                    </div>
+                    <div class="h-6 w-px bg-slate-300 dark:bg-gray-800"></div>
+                    <div>
+                        <div class="text-[10px] text-slate-600 dark:text-gray-300 font-bold">Cấp <span id="user-level" class="text-emerald-600 dark:text-emerald-400 font-extrabold">1</span></div>
+                        <div class="w-16 bg-slate-200 dark:bg-gray-800 h-1 rounded-full overflow-hidden mt-1">
+                            <div id="xp-bar" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 z-10">
+        
+        <!-- LEFT COLUMN: Timer & Configurations (5 Cols) -->
+        <section class="lg:col-span-5 flex flex-col space-y-6">
+            
+            <!-- Giant Timer Display Card -->
+            <div id="timer-card" class="bg-white dark:bg-darkcard border border-slate-200 dark:border-gray-900 rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center relative shadow-xl dark:shadow-2xl backdrop-blur-md transition-all duration-500 glow-emerald">
+                
+                <!-- Info Button ("i") inside the top corner of the card - FIXED POS -->
+                <button onclick="openGuideModal()" class="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-xl border border-slate-200 dark:border-gray-800/80 bg-slate-50 dark:bg-gray-950/60 text-slate-400 dark:text-gray-400 hover:text-emerald-500 hover:border-emerald-500/30 transition duration-200 z-30" title="Hướng dẫn sử dụng hiệu quả">
+                    <i data-lucide="info" class="w-4.5 h-4.5"></i>
+                </button>
+
+                <!-- Floating +XP Flying Container -->
+                <div id="xp-floating-container" class="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl z-10"></div>
+
+                <!-- Mode Select Tabs -->
+                <div class="space-y-4 w-full mb-6 mt-7 sm:mt-0 relative z-20">
+                    <!-- Daily Modes & Breaks -->
+                    <div>
+                        <div class="mb-2 px-1">
+                            <span class="text-[10px] uppercase tracking-widest text-slate-500 dark:text-gray-400 font-bold">Chế độ hàng ngày</span>
+                        </div>
+                        <div class="grid grid-cols-3 bg-slate-100 dark:bg-gray-950/95 p-1.5 rounded-xl border border-slate-200 dark:border-gray-900 w-full gap-1">
+                            <button onclick="setMode('pomodoro')" id="btn-pomodoro" class="w-full py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold bg-emerald-500 text-white dark:text-gray-950 shadow-lg truncate px-1">Focus 25p</button>
+                            <button onclick="setMode('short')" id="btn-short" class="w-full py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold text-slate-600 dark:text-gray-400 hover:bg-slate-200 dark:hover:text-gray-200 truncate px-1">Nghỉ 5p</button>
+                            <button onclick="setMode('long')" id="btn-long" class="w-full py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold text-slate-600 dark:text-gray-400 hover:bg-slate-200 dark:hover:text-gray-200 truncate px-1">Nghỉ 15p</button>
+                        </div>
+                    </div>
+
+                    <!-- Exam Simulation Modes -->
+                    <div>
+                        <span class="text-[10px] uppercase tracking-widest text-slate-500 dark:text-gray-400 font-bold block mb-2 px-1">Giả lập phòng thi (Luyện Đề áp lực)</span>
+                        <div class="grid grid-cols-2 bg-slate-100 dark:bg-gray-950/95 p-1.5 rounded-xl border border-slate-200 dark:border-gray-900 w-full gap-1.5">
+                            <button onclick="setMode('english60')" id="btn-english" class="w-full py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold text-slate-600 dark:text-gray-400 hover:bg-slate-200 dark:hover:text-gray-200 flex items-center justify-center gap-1 sm:gap-1.5 px-1 truncate">
+                                <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-inherit shrink-0"></i> Anh (60p)
+                            </button>
+                            <button onclick="setMode('math120')" id="btn-math" class="w-full py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold text-slate-600 dark:text-gray-400 hover:bg-slate-200 dark:hover:text-gray-200 flex items-center justify-center gap-1 sm:gap-1.5 px-1 truncate">
+                                <i data-lucide="book-open" class="w-3.5 h-3.5 text-inherit shrink-0"></i> Toán/Văn (120p)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Continuous Study Mode -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2 px-1">
+                            <span class="text-[10px] uppercase tracking-widest text-slate-500 dark:text-gray-400 font-bold block">Chế độ tự chọn</span>
+                            <span id="continuous-indicator" class="hidden text-[9px] text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-900/30 px-2 py-0.5 rounded-md font-mono font-bold">Đang kích hoạt</span>
+                        </div>
+                        <div class="bg-slate-100 dark:bg-gray-950/95 p-3 rounded-xl border border-slate-200 dark:border-gray-900 w-full space-y-3">
+                            <div class="flex items-center justify-between gap-1.5">
+                                <button onclick="setMode('continuous')" id="btn-continuous-mode" class="flex-grow py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold text-slate-600 dark:text-gray-400 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 hover:bg-slate-50 flex items-center justify-center gap-1.5">
+                                    <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Chuyển sang Học tự do
+                                </button>
+                            </div>
+                            <!-- Fine adjustment buttons -->
+                            <div class="flex items-center justify-between gap-1">
+                                <button onclick="adjustContinuousTime(-10)" class="flex-1 py-1 text-[10px] bg-white dark:bg-gray-900 hover:bg-slate-50 dark:hover:bg-gray-800 text-slate-600 dark:text-gray-300 font-bold rounded-md border border-slate-200 dark:border-gray-800">-10m</button>
+                                <button onclick="adjustContinuousTime(-1)" class="flex-1 py-1 text-[10px] bg-white dark:bg-gray-900 hover:bg-slate-50 dark:hover:bg-gray-800 text-slate-600 dark:text-gray-300 font-bold rounded-md border border-slate-200 dark:border-gray-800">-1m</button>
+                                <span id="continuous-val" class="px-1 sm:px-2 font-mono text-[10px] sm:text-xs font-bold text-blue-600 dark:text-blue-400 w-10 sm:w-12 text-center">45m</span>
+                                <button onclick="adjustContinuousTime(1)" class="flex-1 py-1 text-[10px] bg-white dark:bg-gray-900 hover:bg-slate-50 dark:hover:bg-gray-800 text-slate-600 dark:text-gray-300 font-bold rounded-md border border-slate-200 dark:border-gray-800">+1m</button>
+                                <button onclick="adjustContinuousTime(10)" class="flex-1 py-1 text-[10px] bg-white dark:bg-gray-900 hover:bg-slate-50 dark:hover:bg-gray-800 text-slate-600 dark:text-gray-300 font-bold rounded-md border border-slate-200 dark:border-gray-800">+10m</button>
+                            </div>
+                            <!-- Fine slider -->
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] text-slate-400 dark:text-gray-500 font-bold">1m</span>
+                                <input type="range" id="continuous-slider" min="1" max="180" value="45" oninput="onContinuousSliderChange(this.value)" class="flex-grow h-1.5 bg-slate-300 dark:bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                                <span class="text-[9px] text-slate-400 dark:text-gray-500 font-bold">180m</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Ring Timer Graphic -->
+                <div id="visual-circle-container" class="relative w-56 h-56 flex items-center justify-center mb-6 transition-transform duration-300">
+                    <!-- SVG Dial -->
+                    <svg class="absolute w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" stroke="currentColor" class="text-slate-200 dark:text-gray-900" stroke-width="4" fill="transparent" />
+                        <circle id="progress-circle" cx="50" cy="50" r="45" stroke="#10b981" stroke-width="4.5" fill="transparent" stroke-dasharray="283" stroke-dashoffset="0" stroke-linecap="round" class="progress-transition" />
+                    </svg>
+                    <!-- Core Counter -->
+                    <div class="text-center z-10">
+                        <div id="timer-display" class="text-5xl font-semibold timer-font tracking-tight tabular-nums text-slate-800 dark:text-gray-50 transition-colors duration-300">25:00</div>
+                        <div id="timer-label" class="text-[9px] uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mt-2 font-bold bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-full inline-block">Chế độ tập trung</div>
+                    </div>
+                </div>
+
+                <!-- Primary Controller Toggles -->
+                <div class="flex items-center gap-4 w-full justify-center relative z-20">
+                    <button id="btn-toggle" onclick="toggleTimer()" class="w-40 py-3.5 rounded-xl bg-slate-900 dark:bg-gray-50 text-white dark:text-gray-950 hover:bg-slate-800 dark:hover:bg-white active:scale-95 transition-all duration-150 font-bold text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2">
+                        <i id="toggle-icon" data-lucide="play" class="w-4 h-4 fill-current"></i>
+                        <span id="toggle-text">Bắt Đầu</span>
+                    </button>
+                    <button onclick="resetTimer()" class="p-3.5 rounded-xl border border-slate-300 dark:border-gray-800 text-slate-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-gray-100 hover:border-slate-400 dark:hover:border-gray-600 active:scale-95 transition-all bg-white dark:bg-gray-950/40" title="Đặt lại bộ đếm">
+                        <i data-lucide="rotate-ccw" class="w-4.5 h-4.5"></i>
+                    </button>
+                </div>
+
+                <!-- Motivation & Dynamic Statistics Panel -->
+                <div class="w-full mt-6 pt-5 border-t border-slate-200 dark:border-gray-800/60 flex flex-col items-center justify-center gap-3 relative z-20">
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <!-- Pomo Count -->
+                        <span class="text-[10px] text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 px-3 py-1.5 rounded-lg font-mono font-bold flex items-center gap-1.5 shadow-sm">
+                            <i data-lucide="target" class="w-3.5 h-3.5"></i>
+                            <span id="pomo-count">Hoàn thành: 0</span>
+                        </span>
+                        <!-- Dynamic Status -->
+                        <span class="text-[10px] text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 px-3 py-1.5 rounded-lg font-mono font-bold flex items-center gap-1.5 shadow-sm">
+                            <i data-lucide="award" class="w-3.5 h-3.5"></i>
+                            <span id="motivational-level">Sẵn sàng bứt phá!</span>
+                        </span>
+                    </div>
+                    <p id="motivational-quote" class="text-[11px] text-slate-500 dark:text-gray-400 italic text-center font-medium max-w-[95%] transition-opacity duration-500">
+                        "Kỷ luật là cầu nối giữa mục tiêu và thành tựu."
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- Auditory Environments & Configuration Panel -->
+            <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-gray-900 rounded-2xl p-5 flex flex-col gap-4 text-xs shadow-md dark:shadow-none">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2.5">
+                        <i data-lucide="volume-2" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
+                        <div>
+                            <span class="font-semibold text-slate-800 dark:text-gray-200 block">Âm thanh phòng thi (Tích tắc)</span>
+                            <span class="text-[10px] text-slate-500 text-gray-500 block">Giúp kích thích não bộ tập trung cao độ</span>
+                        </div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input id="toggle-tick" type="checkbox" class="sr-only peer">
+                        <div class="w-10 h-5 bg-slate-300 dark:bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:after:bg-gray-400 after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500 peer-checked:after:bg-white"></div>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT COLUMN: Anki Heatmap & Advanced Task Analytics (7 Cols) -->
+        <section class="lg:col-span-7 flex flex-col space-y-6">
+            
+            <!-- Anki Heatmap Panel -->
+            <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-gray-900 rounded-2xl p-5 shadow-xl dark:shadow-2xl backdrop-blur-md relative">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 border-b border-slate-200 dark:border-gray-900 pb-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-gray-200 flex items-center gap-2">
+                        <i data-lucide="calendar" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
+                        Lịch Sử Luyện Tập (Anki Heatmap)
+                    </h3>
+                    
+                    <!-- NEW: Deep Stats Modal Trigger -->
+                    <div class="flex items-center gap-3">
+                        <button onclick="openStatsModal()" class="text-[10px] bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/50 px-2.5 py-1 rounded-md font-bold uppercase tracking-wider hover:bg-indigo-100 dark:hover:bg-indigo-900 transition flex items-center gap-1.5">
+                            <i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Phân tích
+                        </button>
+                        <div class="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-gray-400 font-bold hidden sm:flex">
+                            <span>Ít</span>
+                            <span class="w-3 h-3 rounded bg-slate-100 dark:bg-gray-900 border border-slate-200 dark:border-gray-800/30"></span>
+                            <span class="w-3 h-3 rounded bg-emerald-100/40 dark:bg-emerald-950/30 border border-emerald-200/40 dark:border-emerald-900/20"></span>
+                            <span class="w-3 h-3 rounded bg-emerald-300/60 dark:bg-emerald-800/50 border border-emerald-400/50 dark:border-emerald-700/30"></span>
+                            <span class="w-3 h-3 rounded bg-emerald-500/80 dark:bg-emerald-600/70 border border-emerald-500/70 dark:border-emerald-500/40"></span>
+                            <span class="w-3 h-3 rounded bg-emerald-600 dark:bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.6)]"></span>
+                            <span>Nhiều (Tịnh Tiến)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Heatmap grid -->
+                <div class="overflow-x-auto pb-2">
+                    <div id="activity-heatmap" class="grid grid-flow-col gap-[4px] w-max select-none mx-auto">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="mt-2.5 text-[10px] text-slate-500 dark:text-gray-400 font-medium flex flex-col sm:flex-row justify-between gap-1">
+                    <span>Thành quả tích lũy trong 12 tuần qua</span>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold">Màu sắc đậm dần tịnh tiến theo kỷ lục cá nhân!</span>
+                </div>
+
+                <!-- Basic Stats Panel below Heatmap -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-5 pt-4 border-t border-slate-200 dark:border-gray-900/80">
+                    <div class="bg-slate-50 dark:bg-gray-950/80 border border-slate-200 dark:border-gray-900 p-2.5 rounded-xl text-center">
+                        <span class="text-[9px] text-slate-500 dark:text-gray-500 uppercase font-bold block mb-0.5">Tổng thời gian</span>
+                        <span id="stat-total-time" class="timer-font text-xs font-extrabold text-emerald-600 dark:text-emerald-400">0 phút</span>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-gray-950/80 border border-slate-200 dark:border-gray-900 p-2.5 rounded-xl text-center">
+                        <span class="text-[9px] text-slate-500 dark:text-gray-500 uppercase font-bold block mb-0.5">Tổng số phiên</span>
+                        <span id="stat-total-sessions" class="timer-font text-xs font-extrabold text-emerald-600 dark:text-emerald-400">0</span>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-gray-950/80 border border-slate-200 dark:border-gray-900 p-2.5 rounded-xl text-center">
+                        <span class="text-[9px] text-slate-500 dark:text-gray-500 uppercase font-bold block mb-0.5">Số ngày học</span>
+                        <span id="stat-active-days" class="timer-font text-xs font-extrabold text-emerald-600 dark:text-emerald-400">0 ngày</span>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-gray-950/80 border border-slate-200 dark:border-gray-900 p-2.5 rounded-xl text-center">
+                        <span class="text-[9px] text-slate-500 dark:text-gray-500 uppercase font-bold block mb-0.5">Học mỗi ngày</span>
+                        <span id="stat-avg-time" class="timer-font text-xs font-extrabold text-emerald-600 dark:text-emerald-400">0p / ngày</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task Board With Targeted Time Analytics -->
+            <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-gray-900 rounded-2xl p-6 flex-grow flex flex-col justify-between shadow-xl dark:shadow-2xl min-h-[350px]">
+                <div>
+                    <div class="flex justify-between items-center mb-4 border-b border-slate-200 dark:border-gray-900 pb-3">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-square" class="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400 animate-pulse"></i>
+                            <div>
+                                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-gray-200">Mục tiêu hôm nay</h2>
+                                <p class="text-[9px] text-slate-500 dark:text-gray-500">Mỗi giây bạn tập trung đều được cộng trực tiếp vào tác vụ</p>
+                            </div>
+                        </div>
+                        <span id="task-counter" class="text-[9px] bg-slate-100 dark:bg-gray-900 border border-slate-200 dark:border-gray-850 px-2.5 py-1 rounded-full font-bold text-emerald-600 dark:text-emerald-400 font-mono">0 Nhiệm vụ</span>
+                    </div>
+
+                    <!-- Add task form -->
+                    <form id="task-form" onsubmit="addTask(event)" class="relative mb-5">
+                        <input id="task-input" type="text" placeholder="Nhập mục tiêu khẩn cấp tiếp theo..." required class="w-full bg-slate-50 dark:bg-gray-950 border border-slate-300 dark:border-gray-900 focus:border-emerald-500/50 rounded-xl pl-4 pr-14 py-3.5 text-xs placeholder-slate-400 dark:placeholder-gray-500 focus:outline-none text-slate-800 dark:text-gray-100 font-medium transition-all">
+                        <button type="submit" class="absolute right-2 top-2 p-1.5 rounded-lg bg-white dark:bg-gray-900 hover:bg-slate-100 dark:hover:bg-gray-800 text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-gray-850 transition-all" title="Thêm nhiệm vụ">
+                            <i data-lucide="plus" class="w-4.5 h-4.5"></i>
+                        </button>
+                    </form>
+
+                    <!-- Tasks List Container -->
+                    <div id="tasks-list" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Focus Target Status Banner -->
+                <div class="mt-6 pt-4 border-t border-slate-200 dark:border-gray-900">
+                    <span class="text-[10px] text-slate-500 dark:text-gray-500 uppercase font-bold tracking-widest block mb-2">Mục tiêu đang xử lý:</span>
+                    <div id="active-task-container" class="flex items-center justify-between bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-xl p-3.5">
+                        <div class="flex items-center gap-3 text-xs text-slate-800 dark:text-gray-200">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-ping"></span>
+                            <span id="active-task-text" class="font-semibold text-slate-800 dark:text-gray-200 line-clamp-1">Vui lòng chọn một mục tiêu bên trên để đếm giờ!</span>
+                        </div>
+                        <span class="text-[9px] text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/30 px-2.5 py-0.5 rounded font-extrabold uppercase tracking-wider">MỤC TIÊU</span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- NEW: SYSTEM SETTINGS MODAL (Giao diện cài đặt răng cưa) -->
+    <div id="settings-modal" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/50 dark:bg-gray-950/80 backdrop-blur-md hidden transition-opacity duration-300">
+        <div class="bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-2xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden flex flex-col">
+            <!-- Background Decoration -->
+            <div class="absolute -right-12 -bottom-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-2xl"></div>
+
+            <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-200 dark:border-gray-900">
+                <div class="flex items-center gap-2.5">
+                    <i data-lucide="sliders-horizontal" class="w-5 h-5 text-emerald-500"></i>
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-gray-100 uppercase tracking-wider">Cài đặt hệ thống</h3>
+                </div>
+                <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600 dark:text-gray-500 dark:hover:text-gray-300 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Settings Content -->
+            <div class="space-y-6 text-xs">
+                
+                <!-- 1. Volume Config Control -->
+                <div class="bg-slate-50 dark:bg-gray-900/40 border border-slate-100 dark:border-gray-800/60 rounded-xl p-4 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-700 dark:text-gray-200 flex items-center gap-2">
+                            <i data-lucide="volume-2" class="w-4 h-4 text-emerald-500"></i>
+                            Âm lượng hệ thống
+                        </span>
+                        <span id="volume-percentage" class="font-mono font-black text-emerald-600 dark:text-emerald-400">100%</span>
+                    </div>
+                    
+                    <p class="text-[10px] text-slate-500 dark:text-gray-400 leading-relaxed">Điều chỉnh âm lượng chuông báo hoàn thành và tiếng gõ nhịp tích tắc.</p>
+                    
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="volume" class="w-4 h-4 text-slate-400 shrink-0"></i>
+                        <input id="settings-volume" type="range" min="0" max="200" value="100" oninput="onVolumeSliderChange(this.value)" class="flex-grow h-1.5 bg-slate-200 dark:bg-gray-800 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                        <i data-lucide="volume-2" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                    </div>
+
+                    <!-- Preview Sound Buttons -->
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <button onclick="testTickSound()" class="py-2 px-3 bg-white dark:bg-gray-900 hover:bg-slate-50 dark:hover:bg-gray-850 text-slate-700 dark:text-gray-300 border border-slate-200 dark:border-gray-800 font-bold rounded-lg flex items-center justify-center gap-1.5 transition">
+                            <i data-lucide="music" class="w-3.5 h-3.5"></i> Thử Tích Tắc
+                        </button>
+                        <button onclick="testChimeSound()" class="py-2 px-3 bg-white dark:bg-gray-900 hover:bg-slate-50 dark:hover:bg-gray-850 text-slate-700 dark:text-gray-300 border border-slate-200 dark:border-gray-800 font-bold rounded-lg flex items-center justify-center gap-1.5 transition">
+                            <i data-lucide="bell" class="w-3.5 h-3.5"></i> Thử Chuông Báo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Pomo Cycle Settings -->
+                <div class="bg-slate-50 dark:bg-gray-900/40 border border-slate-100 dark:border-gray-800/60 rounded-xl p-4 space-y-3">
+                    <span class="font-bold text-slate-700 dark:text-gray-200 flex items-center gap-2">
+                        <i data-lucide="timer" class="w-4 h-4 text-emerald-500"></i>
+                        Cấu hình chu kỳ thời gian
+                    </span>
+                    <p class="text-[10px] text-slate-500 dark:text-gray-400">Thay đổi độ dài mặc định của các phiên làm việc và nghỉ ngơi.</p>
+                    
+                    <div class="flex items-center justify-between gap-1.5 bg-white dark:bg-gray-950 p-1.5 rounded-lg border border-slate-200 dark:border-gray-900">
+                        <div class="flex-1 flex flex-col items-center">
+                            <span class="text-[9px] text-slate-400 font-bold uppercase mb-1">Focus (P)</span>
+                            <input id="input-pomo" type="number" min="1" max="180" value="25" class="w-14 bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-md py-1 text-center font-mono font-bold text-slate-800 dark:text-gray-100 text-xs">
+                        </div>
+                        <span class="text-slate-300 dark:text-gray-700 font-bold text-sm">/</span>
+                        <div class="flex-1 flex flex-col items-center">
+                            <span class="text-[9px] text-slate-400 font-bold uppercase mb-1">Nghỉ ngắn</span>
+                            <input id="input-short" type="number" min="1" max="60" value="5" class="w-14 bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-md py-1 text-center font-mono font-bold text-slate-800 dark:text-gray-100 text-xs">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Danger Zone -->
+                <div class="border border-red-200/50 dark:border-red-900/30 bg-red-50/10 dark:bg-red-950/5 rounded-xl p-4 space-y-2">
+                    <span class="font-bold text-red-600 dark:text-red-400 flex items-center gap-2">
+                        <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                        Vùng nhạy cảm
+                    </span>
+                    <p class="text-[10px] text-slate-500 dark:text-gray-400 leading-relaxed">Xóa vĩnh viễn toàn bộ lịch sử rèn luyện, Heatmap học tập và cấp độ hiện tại của bạn.</p>
+                    <button onclick="openResetModal()" class="w-full py-2 bg-red-100 hover:bg-red-200 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-200/40 dark:border-red-900/30 font-bold rounded-lg transition uppercase tracking-wider text-[10px]">
+                        Xóa toàn bộ dữ liệu ứng dụng
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-200 dark:border-gray-900 flex gap-3">
+                <button onclick="closeSettingsModal()" class="flex-grow py-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-gray-900 dark:hover:bg-gray-800 text-slate-600 dark:text-gray-300 font-bold text-xs uppercase tracking-wider">Hủy bỏ</button>
+                <button onclick="saveAllSettings()" class="flex-grow py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white dark:text-gray-950 font-bold text-xs uppercase tracking-wider shadow-lg transition">Lưu Thay Đổi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Advanced Stats Modal (Anki Style) -->
+    <div id="stats-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 dark:bg-gray-950/80 backdrop-blur-md hidden transition-opacity duration-300">
+        <div class="bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
+            <!-- Decorative blur -->
+            <div class="absolute -left-20 -top-20 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-200 dark:border-gray-900">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="bar-chart-2" class="w-5 h-5 text-indigo-500"></i>
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-gray-100 uppercase tracking-wider">Phân tích chuyên sâu</h3>
+                </div>
+                <button onclick="closeStatsModal()" class="text-slate-400 hover:text-slate-600 dark:text-gray-500 dark:hover:text-gray-300 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="overflow-y-auto pr-2 space-y-8 flex-grow">
+                
+                <!-- 1. Bar Chart: Last 7 Days -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-600 dark:text-gray-300 mb-4 flex justify-between items-end">
+                        <span>Biểu đồ nỗ lực (7 ngày qua)</span>
+                        <span class="text-[10px] text-slate-400 dark:text-gray-500 font-normal">Đơn vị: Phút</span>
+                    </h4>
+                    <div class="h-40 w-full bg-slate-50 dark:bg-gray-900/50 rounded-xl border border-slate-100 dark:border-gray-800/50 p-4 flex items-end justify-between gap-2 relative">
+                        <!-- Horizontal Grid Lines -->
+                        <div class="absolute inset-0 flex flex-col justify-between pointer-events-none px-4 py-4">
+                            <div class="border-b border-slate-200 dark:border-gray-800/40 w-full h-px border-dashed"></div>
+                            <div class="border-b border-slate-200 dark:border-gray-800/40 w-full h-px border-dashed"></div>
+                            <div class="border-b border-slate-200 dark:border-gray-800/40 w-full h-px border-dashed"></div>
+                        </div>
+                        <!-- Bars injected by JS -->
+                        <div id="bar-chart-container" class="w-full h-full flex items-end justify-between gap-1 sm:gap-4 relative z-10">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW FEATURE: Hourly Focus Distribution (0 - 23h) -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-600 dark:text-gray-300 mb-3 flex justify-between items-end">
+                        <span>Chia nhỏ theo giờ học tập (0h - 23h)</span>
+                        <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Khung giờ năng suất nhất của bạn</span>
+                    </h4>
+                    <div class="h-36 w-full bg-slate-50 dark:bg-gray-900/50 rounded-xl border border-slate-100 dark:border-gray-800/50 p-3 flex items-end justify-between relative">
+                        <!-- Horizontal Grid Lines -->
+                        <div class="absolute inset-0 flex flex-col justify-between pointer-events-none px-4 py-3">
+                            <div class="border-b border-slate-200 dark:border-gray-800/40 w-full h-px border-dashed"></div>
+                            <div class="border-b border-slate-200 dark:border-gray-800/40 w-full h-px border-dashed"></div>
+                            <div class="border-b border-slate-200 dark:border-gray-800/40 w-full h-px border-dashed"></div>
+                        </div>
+                        <!-- 24 Bars injected by JS -->
+                        <div id="hourly-chart-container" class="w-full h-full flex items-end justify-between gap-[2px] sm:gap-[4px] relative z-10">
+                        </div>
+                    </div>
+                    <div class="flex justify-between text-[8px] text-slate-400 dark:text-gray-500 font-extrabold px-1 mt-1.5 uppercase tracking-wider">
+                        <span>00:00 (Đêm)</span>
+                        <span>06:00 (Sáng)</span>
+                        <span>12:00 (Trưa)</span>
+                        <span>18:00 (Chiều)</span>
+                        <span>23:00 (Tối)</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Pie Chart: Mode Distribution -->
+                    <div class="bg-slate-50 dark:bg-gray-900/30 rounded-xl p-4 border border-slate-100 dark:border-gray-800/50">
+                        <h4 class="text-xs font-bold text-slate-600 dark:text-gray-300 mb-4">Phân bổ thời gian</h4>
+                        <div class="flex items-center gap-6">
+                            <!-- CSS Conic Gradient Pie Chart -->
+                            <div id="mode-pie-chart" class="w-24 h-24 rounded-full flex-shrink-0 shadow-lg border-2 border-white dark:border-gray-800" style="background: conic-gradient(#10b981 0% 25%, #f59e0b 25% 50%, #ea580c 50% 75%, #3b82f6 75% 100%);"></div>
+                            
+                            <!-- Legend -->
+                            <div class="flex flex-col gap-2 text-[10px] font-medium w-full">
+                                <div class="flex justify-between items-center"><span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-emerald-500"></span>Pomodoro</span> <span id="leg-pomo" class="font-mono text-slate-600 dark:text-gray-300">0%</span></div>
+                                <div class="flex justify-between items-center"><span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-amber-500"></span>T.Anh</span> <span id="leg-eng" class="font-mono text-slate-600 dark:text-gray-300">0%</span></div>
+                                <div class="flex justify-between items-center"><span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-orange-600"></span>Toán/Văn</span> <span id="leg-math" class="font-mono text-slate-600 dark:text-gray-300">0%</span></div>
+                                <div class="flex justify-between items-center"><span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-blue-500"></span>Tự chọn</span> <span id="leg-cont" class="font-mono text-slate-600 dark:text-gray-300">0%</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Highlight Records -->
+                    <div class="flex flex-col gap-3">
+                        <div class="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-xl p-3 flex items-center gap-3">
+                            <div class="p-2 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg text-emerald-600 dark:text-emerald-400"><i data-lucide="crown" class="w-4 h-4"></i></div>
+                            <div>
+                                <span class="text-[9px] text-emerald-700 dark:text-emerald-500 uppercase font-bold block">Kỷ lục ngày</span>
+                                <span id="stat-best-day" class="text-xs font-extrabold text-emerald-800 dark:text-emerald-400 font-mono">0 phút</span>
+                            </div>
+                        </div>
+                        <div class="bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30 rounded-xl p-3 flex items-center gap-3">
+                            <div class="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg text-indigo-600 dark:text-indigo-400"><i data-lucide="check-circle-2" class="w-4 h-4"></i></div>
+                            <div>
+                                <span class="text-[9px] text-indigo-700 dark:text-indigo-500 uppercase font-bold block">Tổng tác vụ đã diệt</span>
+                                <span id="stat-total-tasks" class="text-xs font-extrabold text-indigo-800 dark:text-indigo-400 font-mono">0 nhiệm vụ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 pt-4 border-t border-slate-200 dark:border-gray-900 flex justify-end">
+                <button onclick="closeStatsModal()" class="px-5 py-2 rounded-xl bg-slate-900 dark:bg-gray-800 hover:bg-slate-800 dark:hover:bg-gray-700 text-white font-bold text-xs uppercase tracking-wider transition">Đóng phân tích</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Guide Modal ("i") -->
+    <div id="guide-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 dark:bg-gray-950/80 backdrop-blur-sm hidden transition-opacity duration-300">
+        <div class="bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
+            
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-200 dark:border-gray-900">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="help-circle" class="w-5 h-5 text-emerald-500 dark:text-emerald-400"></i>
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-gray-100 uppercase tracking-wider">Hướng Dẫn Vận Hành</h3>
+                </div>
+                <button onclick="closeGuideModal()" class="text-slate-400 hover:text-slate-600 dark:text-gray-500 dark:hover:text-gray-300">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs text-slate-600 dark:text-gray-300 overflow-y-auto max-h-96 pr-1">
+                <div>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold block mb-1">1. Quản lý Nhiệm vụ & Đồng bộ giờ học</span>
+                    <p class="leading-relaxed">Khi tạo một nhiệm vụ mới, hãy bấm biểu tượng <strong class="text-emerald-600 dark:text-emerald-400">"Mục tiêu"</strong> để gắn nó vào bộ đếm giờ chính. Thời gian học tích lũy sẽ được tính trực tiếp cho riêng nhiệm vụ đó.</p>
+                </div>
+                <div>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold block mb-1">2. Thống kê chi tiết (Anki Mode)</span>
+                    <p class="leading-relaxed">Sử dụng nút <strong>"Phân tích chuyên sâu"</strong> để xem bảng theo dõi quá trình học tập với các biểu đồ trực quan, giúp bạn có cái nhìn rõ nhất về nỗ lực của bản thân.</p>
+                </div>
+                <div>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold block mb-1">3. Thử thách Phòng thi</span>
+                    <p class="leading-relaxed">Bật tính năng <strong class="text-amber-500">Tích tắc</strong> để tăng cường áp lực phòng thi khi làm đề Toán, Văn hay Tiếng Anh.</p>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-200 dark:border-gray-900 flex justify-end">
+                <button onclick="closeGuideModal()" class="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white dark:text-gray-950 font-bold text-xs uppercase tracking-wider">Đã hiểu rõ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Data Reset Modal -->
+    <div id="reset-modal" class="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-900/50 dark:bg-gray-950/85 backdrop-blur-sm hidden">
+        <div class="bg-white dark:bg-gray-950 border border-red-200 dark:border-red-900/50 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative text-center">
+            <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-950/40 text-red-500 dark:text-red-400 flex items-center justify-center mx-auto mb-4 border border-red-200 dark:border-red-900/30">
+                <i data-lucide="alert-triangle" class="w-6 h-6 animate-bounce"></i>
+            </div>
+            <h3 class="text-sm font-bold text-slate-800 dark:text-gray-100 uppercase tracking-wider mb-2">Cảnh báo xóa dữ liệu!</h3>
+            <p class="text-xs text-slate-500 dark:text-gray-400 mb-6 leading-relaxed">Bạn có thực sự muốn bắt đầu lại? Toàn bộ thống kê, cấp độ và lịch sử Heatmap sẽ mất vĩnh viễn.</p>
+            
+            <div class="flex gap-3">
+                <button onclick="closeResetModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-gray-900 hover:bg-slate-200 dark:hover:bg-gray-800 text-slate-600 dark:text-gray-300 font-bold text-xs uppercase tracking-wider border border-slate-200 dark:border-gray-800">Hủy</button>
+                <button onclick="executeResetAllData()" class="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg">Xóa Toàn Bộ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Toast Notification System -->
+    <div id="toast-notif" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-850 text-slate-800 dark:text-gray-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 z-[90] text-xs max-w-xs">
+        <div id="toast-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
+        <span id="toast-text" class="font-bold tracking-wide">Trạng thái rèn luyện</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-auto pt-6 text-center text-[10px] text-slate-400 dark:text-gray-600 uppercase tracking-widest font-bold">
+        <p>© 2026 FocusFlow Premium • Kỷ luật tối giản & Trí tuệ hóa</p>
+    </footer>
+
+    <!-- JavaScript Execution Layer -->
+    <script>
+        // --- THEME MANAGEMENT ---
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('focusflow_theme', isDark ? 'dark' : 'light');
+            updateThemeIcon();
+            // Re-render heatmap to recalculate continuous HSL colors suited for the new theme
+            generateActivityHeatmap();
+        }
+        function updateThemeIcon() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const iconEl = document.getElementById('theme-icon');
+            if (iconEl) {
+                iconEl.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+                lucide.createIcons();
+            }
+        }
+
+        // Configuration Parameters
+        let CONFIG = {
+            pomodoro: 25,
+            short: 5,
+            long: 15,
+            english60: 60,
+            math120: 120,
+            continuous: 45
+        };
+
+        // NEW: Volume Setting parameter (Giá trị mặc định là 100%)
+        let appVolume = 100;
+
+        // Core App States
+        let timerState = {
+            minutes: CONFIG.pomodoro,
+            seconds: 0,
+            mode: 'pomodoro', 
+            isRunning: false,
+            totalDurationSeconds: CONFIG.pomodoro * 60
+        };
+
+        // --- BACKGROUND WEB WORKER SYSTEM ---
+        const workerScript = `
+            let timer = null;
+            self.onmessage = function(e) {
+                if (e.data === 'start') {
+                    if (timer) clearInterval(timer);
+                    timer = setInterval(() => {
+                        self.postMessage('tick');
+                    }, 1000);
+                } else if (e.data === 'stop') {
+                    if (timer) {
+                        clearInterval(timer);
+                        timer = null;
+                    }
+                }
+            };
+        `;
+
+        const blob = new Blob([workerScript], { type: 'application/javascript' });
+        const worker = new Worker(URL.createObjectURL(blob));
+
+        // Lắng nghe tín hiệu đếm giây (tick) cực kỳ chính xác từ Worker chạy nền độc lập
+        worker.onmessage = function(e) {
+            if (e.data === 'tick' && timerState.isRunning) {
+                tick();
+            }
+        };
+
+        let tasks = [];
+        let stats = {
+            completedSessions: 0,
+            totalFocusMinutes: 0,
+            xp: 0,
+            level: 1,
+            streak: 0,
+            lastCompletedDateString: '', 
+            dailyActivity: {}, 
+            modeDistribution: { pomodoro: 0, english60: 0, math120: 0, continuous: 0 },
+            hourlyActivity: Array(24).fill(0), // Focus minutes per hour (0 - 23)
+            activeTaskId: null
+        };
+
+        // Inspirational Data
+        const motivationalQuotes = [
+            "Kỷ luật là cầu nối giữa mục tiêu và thành tựu.",
+            "Mồ hôi trên trang sách hôm nay là nụ cười ngày mai.",
+            "Thành công là kết quả của những nỗ lực nhỏ bé, lặp đi lặp lại.",
+            "Khoảng cách giữa ước mơ và thực tế được gọi là hành động.",
+            "Không có áp lực, không có kim cương.",
+            "Sự tập trung cao độ sinh ra những kết quả phi thường.",
+            "Đừng dừng lại khi mệt mỏi, hãy dừng lại khi đã hoàn thành.",
+            "Kẻ thù lớn nhất của sự vĩ đại chính là sự bằng lòng."
+        ];
+
+        // DOM elements
+        const timerDisplay = document.getElementById('timer-display');
+        const timerLabel = document.getElementById('timer-label');
+        const progressCircle = document.getElementById('progress-circle');
+        const btnToggle = document.getElementById('btn-toggle');
+        const toggleIcon = document.getElementById('toggle-icon');
+        const toggleText = document.getElementById('toggle-text');
+        
+        const btnPomo = document.getElementById('btn-pomodoro');
+        const btnShort = document.getElementById('btn-short');
+        const btnLong = document.getElementById('btn-long');
+        const btnEnglish = document.getElementById('btn-english');
+        const btnMath = document.getElementById('btn-math');
+        const btnContinuousMode = document.getElementById('btn-continuous-mode');
+        const continuousIndicator = document.getElementById('continuous-indicator');
+        const continuousValText = document.getElementById('continuous-val');
+        const continuousSlider = document.getElementById('continuous-slider');
+        
+        const taskInput = document.getElementById('task-input');
+        const tasksList = document.getElementById('tasks-list');
+        const activeTaskText = document.getElementById('active-task-text');
+        const taskCounter = document.getElementById('task-counter');
+        const xpBar = document.getElementById('xp-bar');
+        const userLevel = document.getElementById('user-level');
+        const userRank = document.getElementById('user-rank');
+        const streakCount = document.getElementById('streak-count');
+        const timerCard = document.getElementById('timer-card');
+
+        // Realtime Clock
+        function updateVietnamClock() {
+            const clockEl = document.getElementById('vietnam-clock');
+            if(!clockEl) return;
+            const now = new Date();
+            const hrs = String(now.getHours()).padStart(2, '0');
+            const mins = String(now.getMinutes()).padStart(2, '0');
+            const secs = String(now.getSeconds()).padStart(2, '0');
+            clockEl.textContent = `${hrs}:${mins}:${secs}`;
+        }
+        setInterval(updateVietnamClock, 1000);
+        updateVietnamClock();
+
+        // Custom Floating Tooltip Logic for Heatmap
+        const tooltip = document.getElementById('heatmap-tooltip');
+        const tooltipDate = document.getElementById('tooltip-date');
+        const tooltipValue = document.getElementById('tooltip-value');
+
+        function showHeatmapTooltip(e, dateStr, focusMinutes) {
+            tooltipDate.textContent = formatDateStringVi(dateStr);
+            tooltipValue.textContent = focusMinutes > 0 ? `Đã tập trung: ${focusMinutes} phút` : 'Chưa rèn luyện';
+            
+            if (focusMinutes > 0) {
+                tooltipValue.className = "text-emerald-600 dark:text-emerald-400 font-extrabold";
+            } else {
+                tooltipValue.className = "text-slate-500 dark:text-gray-500 font-bold";
+            }
+            
+            tooltip.style.display = 'flex';
+            moveHeatmapTooltip(e);
+        }
+
+        function moveHeatmapTooltip(e) {
+            tooltip.style.left = (e.pageX + 12) + 'px';
+            tooltip.style.top = (e.pageY + 12) + 'px';
+        }
+
+        function hideHeatmapTooltip() {
+            tooltip.style.display = 'none';
+        }
+
+        function formatDateStringVi(dateString) {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            return date.toLocaleDateString('vi-VN', { weekday: 'short', month: 'short', day: 'numeric' });
+        }
+
+        // CANVAS CONFETTI
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class ConfettiParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 6 + 5;
+                this.color = `hsl(${Math.random() * 360}, 90%, 60%)`;
+                this.speedX = Math.random() * 10 - 5;
+                this.speedY = Math.random() * -15 - 5;
+                this.gravity = 0.25;
+                this.opacity = 1;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 8 - 4;
+            }
+            update() {
+                this.x += this.speedX;
+                this.speedY += this.gravity;
+                this.y += this.speedY;
+                this.opacity -= 0.01;
+                this.rotation += this.rotationSpeed;
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation * Math.PI / 180);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+                ctx.restore();
+            }
+        }
+
+        function triggerConfettiBurst() {
+            for (let i = 0; i < 70; i++) {
+                particles.push(new ConfettiParticle(canvas.width * 0.25, canvas.height * 0.5));
+                particles.push(new ConfettiParticle(canvas.width * 0.75, canvas.height * 0.5));
+            }
+        }
+
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles = particles.filter(p => p.opacity > 0);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateConfetti);
+        }
+        animateConfetti();
+
+        // --- UPGRADED SOUND SYSTEM WITH DYNAMIC VOLUME ---
+        // Hàm tính toán hệ số Gain dựa trên thanh trượt âm lượng người dùng chọn
+        function getVolumeMultiplier() {
+            // appVolume có giá trị từ 0 đến 200 (100% tương đương hệ số gốc)
+            return appVolume / 100;
+        }
+
+        function playChime() {
+            try {
+                const volMultiplier = getVolumeMultiplier();
+                if (volMultiplier <= 0) return; // Muted
+
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Nốt thứ 1
+                let osc1 = audioCtx.createOscillator(); 
+                let gain1 = audioCtx.createGain();
+                osc1.connect(gain1); gain1.connect(audioCtx.destination);
+                osc1.type = 'sine'; osc1.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+                gain1.gain.setValueAtTime(0, audioCtx.currentTime); 
+                gain1.gain.linearRampToValueAtTime(0.35 * volMultiplier, audioCtx.currentTime + 0.05); // Tăng biên độ gốc lên 0.35
+                gain1.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.8);
+                osc1.start(); osc1.stop(audioCtx.currentTime + 0.8);
+
+                setTimeout(() => {
+                    // Nốt thứ 2
+                    let osc2 = audioCtx.createOscillator(); 
+                    let gain2 = audioCtx.createGain();
+                    osc2.connect(gain2); gain2.connect(audioCtx.destination);
+                    osc2.type = 'sine'; osc2.frequency.setValueAtTime(659.25, audioCtx.currentTime);
+                    gain2.gain.setValueAtTime(0, audioCtx.currentTime); 
+                    gain2.gain.linearRampToValueAtTime(0.35 * volMultiplier, audioCtx.currentTime + 0.05);
+                    gain2.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.9);
+                    osc2.start(); osc2.stop(audioCtx.currentTime + 0.9);
+                }, 100);
+
+                setTimeout(() => {
+                    // Nốt thứ 3
+                    let osc3 = audioCtx.createOscillator(); 
+                    let gain3 = audioCtx.createGain();
+                    osc3.connect(gain3); gain3.connect(audioCtx.destination);
+                    osc3.type = 'sine'; osc3.frequency.setValueAtTime(783.99, audioCtx.currentTime);
+                    gain3.gain.setValueAtTime(0, audioCtx.currentTime); 
+                    gain3.gain.linearRampToValueAtTime(0.45 * volMultiplier, audioCtx.currentTime + 0.05);
+                    gain3.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2);
+                    osc3.start(); osc3.stop(audioCtx.currentTime + 1.2);
+                }, 200);
+            } catch (e) {}
+        }
+
+        function playTickSound() {
+            try {
+                const volMultiplier = getVolumeMultiplier();
+                if (volMultiplier <= 0) return; // Muted
+
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                let osc = audioCtx.createOscillator(); 
+                let gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.type = 'triangle';
+                const isEven = timerState.seconds % 2 === 0;
+                osc.frequency.setValueAtTime(isEven ? 900 : 750, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0, audioCtx.currentTime); 
+                gain.gain.linearRampToValueAtTime(0.08 * volMultiplier, audioCtx.currentTime + 0.002); // Tăng biên độ gốc của tích tắc
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.04);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+            } catch (e) {}
+        }
+
+        // --- NEW: TEST SOUND HANDLERS ---
+        function testTickSound() {
+            playTickSound();
+            showToast("Đang phát thử âm thanh gõ nhịp tích tắc!", "emerald");
+        }
+
+        function testChimeSound() {
+            playChime();
+            showToast("Đang phát thử âm thanh chuông báo kết thúc!", "emerald");
+        }
+
+        // Date utils
+        function getTodayDateString() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+        function getPastDates(numDays) {
+            const dates = [];
+            for (let i = numDays - 1; i >= 0; i--) {
+                const date = new Date(); date.setDate(date.getDate() - i);
+                const yyyy = date.getFullYear(); const mm = String(date.getMonth() + 1).padStart(2, '0'); const dd = String(date.getDate()).padStart(2, '0');
+                dates.push(`${yyyy}-${mm}-${dd}`);
+            }
+            return dates;
+        }
+
+        // Motivation UI
+        function updateMotivationUI() {
+            const pomoCountEl = document.getElementById('pomo-count');
+            if (pomoCountEl) pomoCountEl.textContent = `Hoàn thành: ${stats.completedSessions}`;
+
+            const quoteEl = document.getElementById('motivational-quote');
+            if (quoteEl) {
+                const randIndex = Math.floor(Math.random() * motivationalQuotes.length);
+                quoteEl.style.opacity = 0;
+                setTimeout(() => { quoteEl.textContent = `"${motivationalQuotes[randIndex]}"`; quoteEl.style.opacity = 1; }, 300);
+            }
+
+            const statusEl = document.getElementById('motivational-level');
+            if (statusEl) {
+                if (timerState.isRunning) statusEl.textContent = "Đang đốt cháy năng lượng!";
+                else if (stats.streak >= 7) statusEl.textContent = "Chuỗi kỷ luật thép!";
+                else if (stats.streak >= 3) statusEl.textContent = "Phong độ tuyệt vời!";
+                else statusEl.textContent = "Sẵn sàng bứt phá!";
+            }
+        }
+
+        // IMPROVED: Continuous Progress-based Heatmap (Anki Style Dynamic Lightness)
+        function generateActivityHeatmap() {
+            const heatmapContainer = document.getElementById('activity-heatmap');
+            heatmapContainer.innerHTML = '';
+            const totalDaysToShow = 84; 
+            const pastDates = getPastDates(totalDaysToShow);
+
+            // Find historical maximum daily focus minutes to scale dynamically (prevent 0 division)
+            const activeMinutesValues = Object.values(stats.dailyActivity).filter(m => m > 0);
+            const maxMinutesObserved = activeMinutesValues.length > 0 ? Math.max(...activeMinutesValues) : 60;
+
+            for (let col = 0; col < 12; col++) {
+                const colDiv = document.createElement('div');
+                colDiv.className = 'grid grid-rows-7 gap-[4px]';
+                for (let row = 0; row < 7; row++) {
+                    const dateIdx = (col * 7) + row;
+                    if (dateIdx >= totalDaysToShow) break;
+                    const dateStr = pastDates[dateIdx];
+                    const focusMinutes = stats.dailyActivity[dateStr] || 0;
+                    
+                    let bgClass = '';
+                    let styleStr = '';
+                    let glowClass = '';
+
+                    const isDarkTheme = document.documentElement.classList.contains('dark');
+
+                    if (focusMinutes === 0) {
+                        // Empty Day styling
+                        bgClass = 'bg-slate-100 dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/40';
+                    } else {
+                        // Dynamically calculate the continuous ratio (0.01 to 1.0)
+                        const ratio = Math.min(focusMinutes / maxMinutesObserved, 1);
+                        
+                        if (isDarkTheme) {
+                            const saturation = 70 + Math.round(ratio * 25);
+                            const lightness = 12 + Math.round(ratio * 38);
+                            styleStr = `background-color: hsl(142, ${saturation}%, ${lightness}%); border-color: hsl(142, ${saturation}%, ${lightness}%);`;
+                            if (ratio >= 0.75) {
+                                glowClass = 'shadow-[0_0_8px_rgba(52,211,153,0.5)]';
+                            }
+                        } else {
+                            const saturation = 55 + Math.round(ratio * 30);
+                            const lightness = 90 - Math.round(ratio * 55);
+                            styleStr = `background-color: hsl(142, ${saturation}%, ${lightness}%); border-color: hsl(142, ${saturation}%, ${lightness}%);`;
+                            if (ratio >= 0.75) {
+                                glowClass = 'shadow-[0_0_8px_rgba(16,185,129,0.3)]';
+                            }
+                        }
+                    }
+
+                    const cell = document.createElement('div');
+                    cell.className = `w-4 h-4 rounded-sm transition-all duration-200 hover:scale-125 hover:border-slate-400 dark:hover:border-white ${bgClass} ${glowClass} cursor-crosshair`;
+                    if (styleStr) cell.style = styleStr;
+                    
+                    cell.addEventListener('mouseenter', (e) => showHeatmapTooltip(e, dateStr, focusMinutes));
+                    cell.addEventListener('mousemove', (e) => moveHeatmapTooltip(e));
+                    cell.addEventListener('mouseleave', () => hideHeatmapTooltip());
+                    colDiv.appendChild(cell);
+                }
+                heatmapContainer.appendChild(colDiv);
+            }
+            updateAnkiStats();
+        }
+
+        function updateAnkiStats() {
+            const totalMinutes = stats.totalFocusMinutes || 0;
+            document.getElementById('stat-total-time').textContent = `${totalMinutes} phút`;
+            document.getElementById('stat-total-sessions').textContent = stats.completedSessions || 0;
+            const activeDaysCount = Object.keys(stats.dailyActivity).filter(date => stats.dailyActivity[date] > 0).length;
+            document.getElementById('stat-active-days').textContent = `${activeDaysCount} ngày`;
+            const avg = activeDaysCount > 0 ? Math.round(totalMinutes / activeDaysCount) : 0;
+            document.getElementById('stat-avg-time').textContent = `${avg}p / ngày`;
+        }
+
+        // DEEP STATS MODAL RENDERER
+        function openStatsModal() {
+            document.getElementById('stats-modal').classList.remove('hidden');
+            renderDeepStats();
+        }
+        function closeStatsModal() {
+            document.getElementById('stats-modal').classList.add('hidden');
+        }
+
+        function renderDeepStats() {
+            // 1. Render Bar Chart (Last 7 Days)
+            const chartContainer = document.getElementById('bar-chart-container');
+            chartContainer.innerHTML = '';
+            const past7 = getPastDates(7);
+            
+            let maxMin = 10; // min scale
+            past7.forEach(d => { if(stats.dailyActivity[d] > maxMin) maxMin = stats.dailyActivity[d]; });
+
+            past7.forEach(d => {
+                const mins = stats.dailyActivity[d] || 0;
+                const percent = Math.max((mins / maxMin) * 100, 2); // minimum 2% height for visibility
+                const dayLabel = new Date(d).toLocaleDateString('vi-VN', {weekday: 'short'});
+                
+                const barCol = document.createElement('div');
+                barCol.className = "flex flex-col items-center justify-end h-full w-full gap-2 relative group";
+                barCol.innerHTML = `
+                    <div class="absolute -top-6 text-[9px] font-bold text-slate-500 dark:text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded shadow z-30">${mins}p</div>
+                    <div class="w-full bg-indigo-500 hover:bg-indigo-400 dark:bg-indigo-600 dark:hover:bg-indigo-500 rounded-t-md bar-grow" style="height: ${percent}%;"></div>
+                    <span class="text-[9px] text-slate-400 dark:text-gray-500 font-medium">${dayLabel}</span>
+                `;
+                chartContainer.appendChild(barCol);
+            });
+
+            // 2. Render Hourly Focus Distribution Chart (0h - 23h)
+            const hourlyContainer = document.getElementById('hourly-chart-container');
+            hourlyContainer.innerHTML = '';
+            
+            if (!stats.hourlyActivity || stats.hourlyActivity.length !== 24) {
+                stats.hourlyActivity = Array(24).fill(0);
+            }
+
+            let maxHourVal = 5; // Default baseline scale
+            stats.hourlyActivity.forEach(v => { if (v > maxHourVal) maxHourVal = v; });
+
+            for (let h = 0; h < 24; h++) {
+                const focusMinsInHour = stats.hourlyActivity[h] || 0;
+                const percent = Math.max((focusMinsInHour / maxHourVal) * 100, 2);
+
+                const isHighestHour = focusMinsInHour === maxHourVal && maxHourVal > 0;
+                let barColorClass = "bg-indigo-500 hover:bg-indigo-400 dark:bg-indigo-600 dark:hover:bg-indigo-500";
+                
+                if (isHighestHour) {
+                    barColorClass = "bg-emerald-500 dark:bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.5)]";
+                } else if (focusMinsInHour > 0) {
+                    barColorClass = "bg-teal-500 dark:bg-teal-600";
+                }
+
+                const barUnit = document.createElement('div');
+                barUnit.className = "flex flex-col items-center justify-end h-full flex-grow relative group cursor-pointer";
+                barUnit.innerHTML = `
+                    <div class="absolute -top-7 text-[8.5px] font-bold text-slate-500 dark:text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded shadow z-30 whitespace-nowrap">${h}h: ${focusMinsInHour}p</div>
+                    <div class="w-full ${barColorClass} rounded-t-[2px] transition-all duration-500 h-0" style="height: ${percent}%;"></div>
+                    <span class="text-[8px] text-slate-400 dark:text-gray-600 font-bold mt-1 scale-90 sm:scale-100">${h}</span>
+                `;
+                hourlyContainer.appendChild(barUnit);
+                
+                // Smooth animation timing
+                setTimeout(() => {
+                    const el = barUnit.querySelector('.w-full');
+                    if (el) el.style.height = `${percent}%`;
+                }, 50);
+            }
+
+            // 3. Render Pie Chart (Mode distribution)
+            const md = stats.modeDistribution || { pomodoro: 0, english60: 0, math120: 0, continuous: 0 };
+            const totalMd = md.pomodoro + md.english60 + md.math120 + md.continuous;
+            
+            let pctPomo=0, pctEng=0, pctMath=0, pctCont=0;
+            if(totalMd > 0) {
+                pctPomo = Math.round((md.pomodoro / totalMd)*100);
+                pctEng = Math.round((md.english60 / totalMd)*100);
+                pctMath = Math.round((md.math120 / totalMd)*100);
+                pctCont = 100 - pctPomo - pctEng - pctMath;
+            }
+
+            // CSS Conic Gradient logic
+            const p1 = pctPomo;
+            const p2 = p1 + pctEng;
+            const p3 = p2 + pctMath;
+            
+            const gradientStr = `conic-gradient(
+                #10b981 0% ${p1}%, 
+                #f59e0b ${p1}% ${p2}%, 
+                #ea580c ${p2}% ${p3}%, 
+                #3b82f6 ${p3}% 100%
+            )`;
+            document.getElementById('mode-pie-chart').style.background = totalMd === 0 ? '#e2e8f0' : gradientStr;
+
+            document.getElementById('leg-pomo').textContent = `${pctPomo}%`;
+            document.getElementById('leg-eng').textContent = `${pctEng}%`;
+            document.getElementById('leg-math').textContent = `${pctMath}%`;
+            document.getElementById('leg-cont').textContent = `${pctCont}%`;
+
+            // 4. Highlight Records
+            let bestDay = 0;
+            Object.values(stats.dailyActivity).forEach(val => { if(val > bestDay) bestDay = val; });
+            document.getElementById('stat-best-day').textContent = `${bestDay} phút`;
+            
+            const totalTasksDone = tasks.filter(t => t.completed).length;
+            document.getElementById('stat-total-tasks').textContent = `${totalTasksDone} tác vụ`;
+        }
+
+        // Streak
+        function evaluateStreakAndCheck() {
+            const todayStr = getTodayDateString();
+            if (!stats.lastCompletedDateString) { stats.streak = 0; streakCount.textContent = "0"; return; }
+            const diffDays = Math.ceil(Math.abs(new Date(todayStr) - new Date(stats.lastCompletedDateString)) / (1000 * 60 * 60 * 24));
+            if (diffDays > 1) stats.streak = 0;
+            streakCount.textContent = stats.streak;
+        }
+
+        // Adjust continuous time
+        function adjustContinuousTime(amount) {
+            let newVal = CONFIG.continuous + amount;
+            if (newVal < 1) newVal = 1; if (newVal > 180) newVal = 180;
+            CONFIG.continuous = newVal;
+            continuousValText.textContent = `${newVal}m`; continuousSlider.value = newVal;
+            if (timerState.mode === 'continuous') resetTimer();
+        }
+        function onContinuousSliderChange(val) {
+            CONFIG.continuous = parseInt(val); continuousValText.textContent = `${val}m`;
+            if (timerState.mode === 'continuous') resetTimer();
+        }
+
+        // Set Mode
+        function setMode(mode) {
+            timerState.mode = mode; 
+            
+            // Dừng bộ đếm đang chạy ngầm nếu chuyển chế độ
+            if (timerState.isRunning) {
+                timerState.isRunning = false;
+                worker.postMessage('stop');
+            }
+
+            const baseDailyClass = "w-full py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold text-slate-600 dark:text-gray-400 hover:bg-slate-200 dark:hover:text-gray-200 truncate px-1";
+            const baseExamClass = "w-full py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold text-slate-600 dark:text-gray-400 hover:bg-slate-200 dark:hover:text-gray-200 flex items-center justify-center gap-1 sm:gap-1.5 px-1 truncate";
+            
+            btnPomo.className = baseDailyClass; btnShort.className = baseDailyClass; btnLong.className = baseDailyClass;
+            btnEnglish.className = baseExamClass; btnMath.className = baseExamClass;
+            btnContinuousMode.className = "flex-grow py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold text-slate-600 dark:text-gray-400 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 hover:bg-slate-50 flex items-center justify-center gap-1.5";
+            continuousIndicator.className = "hidden text-[9px] text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-900/30 px-2 py-0.5 rounded-md font-mono font-bold";
+            timerCard.className = "bg-white dark:bg-darkcard border border-slate-200 dark:border-gray-900 rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center relative shadow-xl dark:shadow-2xl backdrop-blur-md transition-all duration-500";
+
+            switch(mode) {
+                case 'pomodoro':
+                    timerState.minutes = CONFIG.pomodoro; timerLabel.textContent = "Tập Trung";
+                    timerLabel.className = "text-[9px] uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mt-2 font-bold bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-full inline-block";
+                    btnPomo.className = "w-full py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold bg-emerald-500 text-white dark:text-gray-950 shadow-lg shadow-emerald-500/20 truncate px-1";
+                    progressCircle.setAttribute('stroke', '#10b981'); timerCard.classList.add('glow-emerald'); break;
+                case 'short':
+                    timerState.minutes = CONFIG.short; timerLabel.textContent = "Nghỉ Ngắn";
+                    timerLabel.className = "text-[9px] uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mt-2 font-bold bg-indigo-100 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 px-2 py-0.5 rounded-full inline-block";
+                    btnShort.className = "w-full py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold bg-indigo-500 text-white dark:text-gray-950 shadow-lg truncate px-1";
+                    progressCircle.setAttribute('stroke', '#6366f1'); break;
+                case 'long':
+                    timerState.minutes = CONFIG.long; timerLabel.textContent = "Nghỉ Dài";
+                    timerLabel.className = "text-[9px] uppercase tracking-widest text-purple-600 dark:text-purple-400 mt-2 font-bold bg-purple-100 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 px-2 py-0.5 rounded-full inline-block";
+                    btnLong.className = "w-full py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold bg-purple-500 text-white dark:text-gray-950 shadow-lg truncate px-1";
+                    progressCircle.setAttribute('stroke', '#a855f7'); break;
+                case 'english60':
+                    timerState.minutes = CONFIG.english60; timerLabel.textContent = "Phòng Thi: Anh Văn";
+                    timerLabel.className = "text-[9px] uppercase tracking-widest text-amber-600 dark:text-amber-500 mt-2 font-bold bg-amber-100 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-2 py-0.5 rounded-full inline-block";
+                    btnEnglish.className = "w-full py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold bg-amber-500 text-white dark:text-gray-950 shadow-lg flex items-center justify-center gap-1 sm:gap-1.5 px-1 truncate";
+                    progressCircle.setAttribute('stroke', '#f59e0b'); timerCard.classList.add('glow-orange'); break;
+                case 'math120':
+                    timerState.minutes = CONFIG.math120; timerLabel.textContent = "Phòng Thi: Toán / Văn";
+                    timerLabel.className = "text-[9px] uppercase tracking-widest text-orange-600 dark:text-orange-500 mt-2 font-bold bg-orange-100 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 px-2 py-0.5 rounded-full inline-block";
+                    btnMath.className = "w-full py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold bg-orange-600 text-white shadow-lg flex items-center justify-center gap-1 sm:gap-1.5 px-1 truncate";
+                    progressCircle.setAttribute('stroke', '#ea580c'); timerCard.classList.add('glow-orange'); break;
+                case 'continuous':
+                    timerState.minutes = CONFIG.continuous; timerLabel.textContent = "Học Tự Do";
+                    timerLabel.className = "text-[9px] uppercase tracking-widest text-blue-600 dark:text-blue-400 mt-2 font-bold bg-blue-100 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 px-2 py-0.5 rounded-full inline-block";
+                    btnContinuousMode.className = "flex-grow py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold bg-blue-500 text-white dark:text-gray-950 shadow-lg shadow-blue-500/20 flex items-center justify-center gap-1.5";
+                    continuousIndicator.classList.remove('hidden'); progressCircle.setAttribute('stroke', '#3b82f6'); timerCard.classList.add('glow-blue'); break;
+            }
+            timerState.seconds = 0; timerState.totalDurationSeconds = timerState.minutes * 60;
+            updateDisplay(); updateControllerState(); updateMotivationUI();
+        }
+
+        // Toggle Timer
+        function updateDisplay() {
+            const dispMin = String(timerState.minutes).padStart(2, '0'); const dispSec = String(timerState.seconds).padStart(2, '0');
+            timerDisplay.textContent = `${dispMin}:${dispSec}`;
+            const remainingSeconds = (timerState.minutes * 60) + timerState.seconds;
+            progressCircle.style.strokeDashoffset = 283 - ((remainingSeconds / timerState.totalDurationSeconds) * 283);
+        }
+
+        function toggleTimer() {
+            if (timerState.isRunning) { 
+                timerState.isRunning = false; 
+                worker.postMessage('stop'); // Gửi yêu cầu tắt đếm giờ ngầm cho Web Worker
+                showToast("Đã tạm dừng đếm ngược.", "amber"); 
+            } 
+            else { 
+                timerState.isRunning = true; 
+                worker.postMessage('start'); // Yêu cầu Web Worker khởi chạy đếm giờ trong thread riêng biệt
+                showToast("Bắt đầu tập trung!", "emerald"); 
+            }
+            updateControllerState(); updateMotivationUI();
+        }
+
+        function resetTimer() {
+            timerState.isRunning = false; 
+            worker.postMessage('stop'); // Luôn bảo đảm dừng worker trước khi reset
+            timerState.minutes = timerState.mode === 'continuous' ? CONFIG.continuous : CONFIG[timerState.mode];
+            timerState.seconds = 0; timerState.totalDurationSeconds = timerState.minutes * 60;
+            updateDisplay(); updateControllerState(); updateMotivationUI();
+            showToast("Đã thiết lập lại đồng hồ.", "emerald");
+        }
+
+        function updateControllerState() {
+            toggleText.textContent = timerState.isRunning ? "Tạm Dừng" : "Bắt Đầu";
+            toggleIcon.setAttribute('data-lucide', timerState.isRunning ? 'pause' : 'play');
+            lucide.createIcons();
+        }
+
+        function tick() {
+            const isTickActive = document.getElementById('toggle-tick').checked;
+            if (isTickActive && ['english60', 'math120', 'pomodoro', 'continuous'].includes(timerState.mode)) playTickSound();
+
+            if (timerState.seconds === 0) {
+                if (timerState.minutes === 0) { handleSessionFinished(); return; }
+                else { timerState.minutes--; timerState.seconds = 59; }
+            } else timerState.seconds--;
+
+            if (['pomodoro', 'english60', 'math120', 'continuous'].includes(timerState.mode) && stats.activeTaskId) {
+                const actTask = tasks.find(t => t.id === stats.activeTaskId);
+                if (actTask) { actTask.focusSeconds = (actTask.focusSeconds || 0) + 1; renderTasks(); saveDataToStorage(); }
+            }
+            updateDisplay();
+        }
+
+        function handleSessionFinished() {
+            timerState.isRunning = false; 
+            worker.postMessage('stop'); // Dừng đếm ngầm khi hoàn thành phiên
+            updateControllerState();
+            let gainedXp = 0; let finishedModeLabel = ""; let minutesAwarded = 0;
+
+            if (timerState.mode === 'pomodoro') { gainedXp = 100; finishedModeLabel = "Phiên Pomodoro"; minutesAwarded = CONFIG.pomodoro; stats.completedSessions++; } 
+            else if (['short', 'long'].includes(timerState.mode)) { gainedXp = 25; finishedModeLabel = "Thời gian hồi phục"; minutesAwarded = CONFIG[timerState.mode]; } 
+            else if (['english60', 'math120'].includes(timerState.mode)) { gainedXp = timerState.mode === 'english60' ? 300 : 600; finishedModeLabel = "Bài giả lập phòng thi"; minutesAwarded = CONFIG[timerState.mode]; } 
+            else if (timerState.mode === 'continuous') { minutesAwarded = CONFIG.continuous; gainedXp = minutesAwarded * 4; finishedModeLabel = "Phiên học liên tục"; }
+
+            stats.xp += gainedXp; stats.totalFocusMinutes += minutesAwarded;
+            
+            // Log Deep Stats - Distribution modes
+            if (!stats.modeDistribution) stats.modeDistribution = { pomodoro: 0, english60: 0, math120: 0, continuous: 0 };
+            if (stats.modeDistribution[timerState.mode] !== undefined) {
+                stats.modeDistribution[timerState.mode] += minutesAwarded;
+            }
+
+            // Log Hourly Statistics (0-23)
+            const currentHour = new Date().getHours();
+            if (!stats.hourlyActivity || stats.hourlyActivity.length !== 24) {
+                stats.hourlyActivity = Array(24).fill(0);
+            }
+            stats.hourlyActivity[currentHour] = (stats.hourlyActivity[currentHour] || 0) + minutesAwarded;
+
+            const todayStr = getTodayDateString();
+            stats.dailyActivity[todayStr] = (stats.dailyActivity[todayStr] || 0) + minutesAwarded;
+            
+            if (stats.lastCompletedDateString !== todayStr) { stats.streak++; stats.lastCompletedDateString = todayStr; }
+
+            evaluateStreakAndCheck(); awardXpEffects(gainedXp); playChime(); triggerConfettiBurst(); levelCheckAndCalculation();
+            generateActivityHeatmap(); updateMotivationUI(); saveDataToStorage();
+            showToast(`Hoàn thành ${finishedModeLabel}! +${gainedXp} XP`, "emerald");
+            setMode(timerState.mode === 'pomodoro' ? 'short' : 'pomodoro');
+        }
+
+        function awardXpEffects(val) {
+            const container = document.getElementById('xp-floating-container');
+            const floater = document.createElement('div');
+            floater.className = "absolute text-xs font-black text-emerald-600 dark:text-emerald-400 select-none animate-bounce duration-1000";
+            floater.style.left = "50%"; floater.style.top = "60%"; floater.style.transform = "translateX(-50%)";
+            floater.innerHTML = `+${val} XP`;
+            container.appendChild(floater); setTimeout(() => floater.remove(), 1800);
+        }
+
+        // Tác vụ tăng cấp
+        function levelCheckAndCalculation() {
+            const xpNeededForNextLevel = stats.level * 350;
+            if (stats.xp >= xpNeededForNextLevel) { stats.xp -= xpNeededForNextLevel; stats.level++; showToast(`Đột phá cấp độ! Bạn đã đạt Cấp ${stats.level}!`, "emerald"); }
+            let title = "Tập Sự";
+            if (stats.level >= 3 && stats.level < 6) title = "Học Giả"; else if (stats.level >= 6 && stats.level < 10) title = "Tri Thức"; else if (stats.level >= 10 && stats.level < 15) title = "Hiền Triết"; else if (stats.level >= 15) title = "Vĩ Nhân Kỷ Luật";
+            userRank.textContent = title; userLevel.textContent = stats.level;
+            xpBar.style.width = `${Math.min(100, (stats.xp / (stats.level * 350)) * 100)}%`;
+        }
+
+        // Tasks logic
+        function addTask(event) {
+            event.preventDefault(); const text = taskInput.value.trim(); if (!text) return;
+            const newTask = { id: crypto.randomUUID(), text: text, completed: false, focusSeconds: 0, createdAt: new Date().toISOString() };
+            tasks.push(newTask); taskInput.value = "";
+            if (tasks.length === 1 || !stats.activeTaskId) stats.activeTaskId = newTask.id;
+            renderTasks(); saveDataToStorage(); showToast("Đã thêm nhiệm vụ mới.", "emerald");
+        }
+        function toggleTaskComplete(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) { task.completed = !task.completed; if (task.completed && stats.activeTaskId === id) stats.activeTaskId = null; renderTasks(); saveDataToStorage(); showToast(task.completed ? "Xuất sắc!" : "Kích hoạt lại mục tiêu.", "emerald"); }
+        }
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id); if (stats.activeTaskId === id) stats.activeTaskId = tasks.length > 0 ? tasks[0].id : null;
+            renderTasks(); saveDataToStorage(); showToast("Đã xóa bỏ tác vụ.", "amber");
+        }
+        function selectActiveTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task && !task.completed) { stats.activeTaskId = id; renderTasks(); saveDataToStorage(); showToast(`Mục tiêu hiện tại: ${task.text}`, "emerald"); }
+        }
+        function formatFocusDuration(seconds) {
+            if (!seconds || seconds <= 0) return '0 giây';
+            const m = Math.floor(seconds / 60); const s = seconds % 60;
+            return m > 0 ? `${m}p ${s}s` : `${s} giây`;
+        }
+        function renderTasks() {
+            tasksList.innerHTML = ""; let completedCount = 0;
+            const sortedTasks = [...tasks].sort((a, b) => { if (a.completed === b.completed) return new Date(b.createdAt) - new Date(a.createdAt); return a.completed ? 1 : -1; });
+
+            sortedTasks.forEach(t => {
+                if (t.completed) completedCount++; const isSelected = stats.activeTaskId === t.id;
+                const li = document.createElement('div');
+                li.className = `flex items-center justify-between p-3.5 rounded-xl border transition-all duration-300 bg-white dark:bg-gray-950/70 ${isSelected ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/5 shadow-[0_0_15px_rgba(16,185,129,0.05)]' : 'border-slate-200 dark:border-gray-900'}`;
+                li.innerHTML = `
+                    <div class="flex items-center gap-3 flex-grow mr-2 max-w-[70%]">
+                        <button onclick="toggleTaskComplete('${t.id}')" class="w-5 h-5 rounded-md border flex items-center justify-center transition ${t.completed ? 'bg-emerald-500 border-emerald-400 text-white' : 'border-slate-300 dark:border-gray-800 hover:border-emerald-500/50'}" title="Đánh dấu hoàn thành">
+                            ${t.completed ? '<i data-lucide="check" class="w-3.5 h-3.5 stroke-[4]"></i>' : ''}
+                        </button>
+                        <div class="flex flex-col">
+                            <span class="text-xs font-semibold ${t.completed ? 'line-through text-slate-400 dark:text-gray-500' : 'text-slate-800 dark:text-gray-200'}">${t.text}</span>
+                            <span class="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold mt-1 tracking-wide flex items-center gap-1"><i data-lucide="history" class="w-3 h-3 text-emerald-500/80"></i> Đã học: ${formatFocusDuration(t.focusSeconds)}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        ${!t.completed ? `<button onclick="selectActiveTask('${t.id}')" class="px-2.5 py-1.5 rounded-lg text-[9px] font-extrabold uppercase tracking-wider border transition-all ${isSelected ? 'bg-emerald-500 text-white border-emerald-400 shadow-sm' : 'bg-slate-100 dark:bg-gray-900 border-slate-200 dark:border-gray-800 hover:bg-slate-200 text-emerald-600 dark:text-emerald-400'}">${isSelected ? 'Đang chạy' : 'Mục tiêu'}</button>` : ''}
+                        <button onclick="deleteTask('${t.id}')" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>
+                `;
+                tasksList.appendChild(li);
+            });
+
+            taskCounter.textContent = `${completedCount}/${tasks.length} Hoàn thành`;
+            const currentActive = tasks.find(t => t.id === stats.activeTaskId);
+            if (currentActive && !currentActive.completed) {
+                activeTaskText.textContent = currentActive.text;
+                activeTaskText.className = "font-extrabold text-emerald-600 dark:text-emerald-400 line-clamp-1";
+            } else {
+                activeTaskText.textContent = "Nhấp chọn nhiệm vụ bên trên để đếm giờ!";
+                activeTaskText.className = "font-medium text-slate-500 dark:text-gray-500 text-xs";
+                stats.activeTaskId = null;
+            }
+            lucide.createIcons();
+        }
+
+        // --- NEW: SYSTEM SETTINGS MANAGEMENT ---
+        function openSettingsModal() {
+            // Nạp thông tin hiện tại vào UI cài đặt
+            document.getElementById('settings-volume').value = appVolume;
+            document.getElementById('volume-percentage').textContent = `${appVolume}%`;
+            document.getElementById('input-pomo').value = CONFIG.pomodoro;
+            document.getElementById('input-short').value = CONFIG.short;
+            
+            document.getElementById('settings-modal').classList.remove('hidden');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.add('hidden');
+        }
+
+        function onVolumeSliderChange(val) {
+            appVolume = parseInt(val);
+            document.getElementById('volume-percentage').textContent = `${appVolume}%`;
+        }
+
+        function saveAllSettings() {
+            // 1. Lưu cấu hình âm lượng
+            localStorage.setItem('focusflow_volume', appVolume);
+
+            // 2. Lưu cấu hình chu kỳ mặc định
+            const inputPomoVal = parseInt(document.getElementById('input-pomo').value);
+            const inputShortVal = parseInt(document.getElementById('input-short').value);
+            
+            if (inputPomoVal >= 1 && inputPomoVal <= 180) CONFIG.pomodoro = inputPomoVal;
+            if (inputShortVal >= 1 && inputShortVal <= 60) CONFIG.short = inputShortVal;
+            
+            if (timerState.mode === 'pomodoro' || timerState.mode === 'short') {
+                resetTimer();
+            }
+            
+            localStorage.setItem('focusflow_config', JSON.stringify(CONFIG));
+            closeSettingsModal();
+            showToast("Đã lưu toàn bộ thiết lập hệ thống!", "emerald");
+        }
+
+        // Toasts & Modals
+        function showToast(msg, colorTheme = "emerald") {
+            const toast = document.getElementById('toast-notif');
+            const text = document.getElementById('toast-text');
+            const dot = document.getElementById('toast-dot');
+            text.textContent = msg;
+            
+            const isDark = document.documentElement.classList.contains('dark');
+            const baseClass = "fixed bottom-6 right-6 transform px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 z-[100] text-xs max-w-xs";
+            
+            if (colorTheme === "amber") {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]";
+                toast.className = `${baseClass} bg-white dark:bg-gray-950 border border-amber-200 dark:border-amber-900/30 text-slate-800 dark:text-gray-100 translate-y-0 opacity-100`;
+            } else {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]";
+                toast.className = `${baseClass} bg-white dark:bg-gray-950 border border-slate-200 dark:border-emerald-900/30 text-slate-800 dark:text-gray-100 translate-y-0 opacity-100`;
+            }
+            setTimeout(() => { toast.classList.replace('translate-y-0', 'translate-y-20'); toast.classList.replace('opacity-100', 'opacity-0'); }, 3500);
+        }
+
+        function saveDataToStorage() { 
+            localStorage.setItem('focusflow_stats', JSON.stringify(stats)); 
+            localStorage.setItem('focusflow_tasks', JSON.stringify(tasks)); 
+        }
+
+        function loadDataFromStorage() {
+            const savedConfig = localStorage.getItem('focusflow_config'); if (savedConfig) CONFIG = JSON.parse(savedConfig);
+            const savedStats = localStorage.getItem('focusflow_stats'); if (savedStats) stats = JSON.parse(savedStats);
+            const savedTasks = localStorage.getItem('focusflow_tasks'); if (savedTasks) tasks = JSON.parse(savedTasks);
+            
+            // Tải mức âm lượng từ bộ nhớ
+            const savedVolume = localStorage.getItem('focusflow_volume');
+            if (savedVolume !== null) {
+                appVolume = parseInt(savedVolume);
+            } else {
+                appVolume = 100; // Giá trị gốc ban đầu
+            }
+
+            // Retroactive structures setup
+            if(!stats.modeDistribution) stats.modeDistribution = { pomodoro: 0, english60: 0, math120: 0, continuous: 0 };
+            if(!stats.hourlyActivity || stats.hourlyActivity.length !== 24) stats.hourlyActivity = Array(24).fill(0);
+        }
+
+        function openGuideModal() { document.getElementById('guide-modal').classList.remove('hidden'); }
+        function closeGuideModal() { document.getElementById('guide-modal').classList.add('hidden'); }
+        function openResetModal() { document.getElementById('reset-modal').classList.remove('hidden'); }
+        function closeResetModal() { document.getElementById('reset-modal').classList.add('hidden'); }
+        
+        function executeResetAllData() {
+            localStorage.clear();
+            showToast("Đã dọn sạch dữ liệu.", "amber");
+            setTimeout(() => { window.location.reload(); }, 1000);
+        }
+
+        // Boot
+        window.onload = function() {
+            updateThemeIcon();
+            loadDataFromStorage();
+            document.getElementById('continuous-slider').value = CONFIG.continuous;
+            continuousValText.textContent = `${CONFIG.continuous}m`;
+
+            setMode('pomodoro'); renderTasks(); evaluateStreakAndCheck(); levelCheckAndCalculation();
+            generateActivityHeatmap(); updateMotivationUI(); 
+            lucide.createIcons();
+            
+            setTimeout(() => { showToast("Chào mừng bạn trở lại hành trình rèn luyện!", "emerald"); }, 800);
+        }
+    </script>
+</body>
+</html>
