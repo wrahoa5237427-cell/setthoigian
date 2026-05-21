@@ -101,7 +101,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-darkbg text-slate-800 dark:text-gray-100 min-h-screen flex flex-col justify-between overflow-x-hidden relative pb-8">
 
-    <!-- Theme Initialization Script (Prevents flash) -->
+    <!-- Theme Initialization Script -->
     <script>
         const savedTheme = localStorage.getItem('focusflow_theme');
         if (savedTheme === 'light') {
@@ -138,7 +138,7 @@
             <!-- Profile, Cloud Sync, Themes & Levels -->
             <div class="flex flex-wrap items-center justify-center gap-3 md:gap-4">
                 
-                <!-- NEW: Account Profile Sync Status -->
+                <!-- Account Profile Sync Status -->
                 <div id="user-profile-badge" class="flex items-center gap-2 bg-slate-100 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 px-3 py-1.5 rounded-xl cursor-pointer hover:bg-slate-200 dark:hover:bg-gray-800 transition" onclick="openAuthModal()">
                     <div id="user-avatar-container" class="w-6 h-6 rounded-full bg-slate-300 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
                         <i data-lucide="user" class="w-3.5 h-3.5 text-slate-600 dark:text-gray-300"></i>
@@ -156,7 +156,7 @@
                     <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
                 </button>
 
-                <!-- Settings Cog Icon (Bánh răng cài đặt) -->
+                <!-- Settings Cog Icon -->
                 <button onclick="openSettingsModal()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-gray-900/50 dark:hover:bg-gray-800 border border-slate-200 dark:border-gray-800 text-slate-500 dark:text-gray-400 dark:hover:text-gray-200 transition-colors" title="Cấu hình hệ thống & Âm lượng">
                     <i data-lucide="settings" class="w-4 h-4"></i>
                 </button>
@@ -201,7 +201,7 @@
             <!-- Giant Timer Display Card -->
             <div id="timer-card" class="bg-white dark:bg-darkcard border border-slate-200 dark:border-gray-900 rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center relative shadow-xl dark:shadow-2xl backdrop-blur-md transition-all duration-500 glow-emerald">
                 
-                <!-- Info Button ("i") inside the top corner of the card -->
+                <!-- Info Button inside the top corner of the card -->
                 <button onclick="openGuideModal()" class="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-xl border border-slate-200 dark:border-gray-800/80 bg-slate-50 dark:bg-gray-950/60 text-slate-400 dark:text-gray-400 hover:text-emerald-500 hover:border-emerald-500/30 transition duration-200 z-30" title="Hướng dẫn sử dụng hiệu quả">
                     <i data-lucide="info" class="w-4.5 h-4.5"></i>
                 </button>
@@ -407,7 +407,7 @@
                     <!-- Add task form -->
                     <form id="task-form" onsubmit="addTask(event)" class="relative mb-5">
                         <input id="task-input" type="text" placeholder="Nhập mục tiêu khẩn cấp tiếp theo..." required class="w-full bg-slate-50 dark:bg-gray-950 border border-slate-300 dark:border-gray-900 focus:border-emerald-500/50 rounded-xl pl-4 pr-14 py-3.5 text-xs placeholder-slate-400 dark:placeholder-gray-500 focus:outline-none text-slate-800 dark:text-gray-100 font-medium transition-all">
-                        <button type="submit" class="absolute right-2 top-2 p-1.5 rounded-lg bg-white dark:bg-gray-900 hover:bg-slate-100 dark:hover:bg-gray-800 text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-gray-850 transition-all" title="Thêm nhiệm vụ">
+                        <button type="submit" class="absolute right-2 top-2 p-1.5 rounded-lg bg-white dark:bg-gray-900 hover:bg-slate-100 dark:hover:bg-gray-850 text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-gray-850 transition-all" title="Thêm nhiệm vụ">
                             <i data-lucide="plus" class="w-4.5 h-4.5"></i>
                         </button>
                     </form>
@@ -434,7 +434,7 @@
         </section>
     </main>
 
-    <!-- NEW: FIREBASE AUTHENTICATION MODAL (Giao diện đăng ký/đăng nhập Google, Email) -->
+    <!-- FIREBASE AUTHENTICATION MODAL -->
     <div id="auth-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 dark:bg-gray-950/90 backdrop-blur-md hidden transition-all duration-300">
         <div class="bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative overflow-hidden flex flex-col">
             <!-- Decorative light effects -->
@@ -625,7 +625,7 @@
         </div>
     </div>
 
-    <!-- Advanced Stats Modal (Anki Style) -->
+    <!-- Advanced Stats Modal -->
     <div id="stats-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 dark:bg-gray-950/80 backdrop-blur-md hidden transition-opacity duration-300">
         <div class="bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
             <div class="absolute -left-20 -top-20 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -641,7 +641,7 @@
             </div>
 
             <div class="overflow-y-auto pr-2 space-y-8 flex-grow">
-                <!-- 1. Bar Chart: Last 7 Days -->
+                <!-- Bar Chart: Last 7 Days -->
                 <div>
                     <h4 class="text-xs font-bold text-slate-600 dark:text-gray-300 mb-4 flex justify-between items-end">
                         <span>Biểu đồ nỗ lực (7 ngày qua)</span>
@@ -658,7 +658,7 @@
                     </div>
                 </div>
 
-                <!-- Hourly Focus Distribution (0 - 23h) -->
+                <!-- Hourly Focus Distribution -->
                 <div>
                     <h4 class="text-xs font-bold text-slate-600 dark:text-gray-300 mb-3 flex justify-between items-end">
                         <span>Chia nhỏ theo giờ học tập (0h - 23h)</span>
@@ -807,7 +807,7 @@
             getDoc 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- FIREBASE CONFIGURATION (Provided by User) ---
+        // Firebase configurations
         const firebaseConfig = {
             apiKey: "AIzaSyDON9TZ-fsMsLKLGkqhqk6EXKCF5VaPEc4",
             authDomain: "focusflowstudy.firebaseapp.com",
@@ -818,15 +818,14 @@
             measurementId: "G-6EVY6Z6C4F"
         };
 
-        // Initialize Firebase Apps
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Dynamic App ID resolution based on context
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'focusflowstudy';
 
-        let activeAuthView = 'login'; // 'login' or 'signup'
+        let activeAuthView = 'login'; 
 
         // Theme management
         function toggleTheme() {
@@ -854,7 +853,6 @@
             continuous: 45
         };
 
-        // Volume configuration
         let appVolume = 100;
 
         // Core App States
@@ -1644,10 +1642,9 @@
             setTimeout(() => { 
                 toast.classList.replace('translate-y-0', 'translate-y-20'); 
                 toast.classList.replace('opacity-100', 'opacity-0'); 
-            }, 3500);
+            }, 6000); 
         }
 
-        // Offline Save to LocalStorage fallback
         function saveLocalFallback() {
             localStorage.setItem('focusflow_stats', JSON.stringify(stats)); 
             localStorage.setItem('focusflow_tasks', JSON.stringify(tasks)); 
@@ -1657,19 +1654,17 @@
         async function saveDataToStorage() {
             saveLocalFallback();
             
-            // Critical Rule: Auth before query
             const user = auth.currentUser;
             if (!user) return;
 
             try {
-                // RULE 1: Strict collection naming paths
+                // RULE 1: Use specific artifacts subcollections path structure
                 const statsDocPath = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'stats');
                 const tasksDocPath = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'tasks');
 
                 await setDoc(statsDocPath, stats, { merge: true });
                 await setDoc(tasksDocPath, { list: tasks });
 
-                // Update UI sync badge status
                 document.getElementById('header-sync-status').innerHTML = `<span class="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span> Đã Đồng Bộ`;
                 document.getElementById('header-sync-status').className = "text-[8px] text-emerald-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5";
             } catch (error) {
@@ -1677,11 +1672,11 @@
             }
         }
 
-        // Firestore Unified Fetch
+        // Firestore Unified Fetch and Merging operations
         async function fetchCloudDataAndMerge(user) {
             if (!user) return;
             try {
-                // RULE 1: Strict path syntax format
+                // RULE 1: Use strictly predefined artifact path configurations
                 const statsDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'stats');
                 const tasksDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'tasks');
 
@@ -1691,18 +1686,15 @@
                 if (statsSnap.exists()) {
                     stats = statsSnap.data();
                 } else {
-                    // No cloud profile exists, bootstrap user profile stats
                     await setDoc(statsDocRef, stats);
                 }
 
                 if (tasksSnap.exists()) {
                     tasks = tasksSnap.data().list || [];
                 } else {
-                    // Seed initial cloud task configuration
                     await setDoc(tasksDocRef, { list: tasks });
                 }
 
-                // Render components with cloud populated values
                 renderTasks();
                 evaluateStreakAndCheck();
                 levelCheckAndCalculation();
@@ -1767,7 +1759,7 @@
             }
         }
 
-        // Email & Password Auth Handler
+        // Email & Password Auth Handler with advanced error reporting
         async function handleEmailAuth(e) {
             e.preventDefault();
             const email = document.getElementById('auth-email').value.trim();
@@ -1786,7 +1778,11 @@
                     closeAuthModal();
                 } catch (error) {
                     console.error("Signup failure:", error);
-                    showToast("Đăng ký thất bại: " + error.message, "amber");
+                    let errMsg = "Đăng ký thất bại!";
+                    if (error.code === 'auth/email-already-in-use') errMsg = "Email này đã được đăng ký trước đó!";
+                    else if (error.code === 'auth/weak-password') errMsg = "Mật khẩu quá yếu (Tối thiểu 6 ký tự)!";
+                    else if (error.code === 'auth/invalid-email') errMsg = "Định dạng email không hợp lệ!";
+                    showToast(errMsg, "amber");
                 }
             } else {
                 try {
@@ -1796,12 +1792,15 @@
                     closeAuthModal();
                 } catch (error) {
                     console.error("Login failure:", error);
-                    showToast("Sai email hoặc mật khẩu!", "amber");
+                    let errMsg = "Sai email hoặc mật khẩu!";
+                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') errMsg = "Sai email hoặc mật khẩu!";
+                    else if (error.code === 'auth/invalid-credential') errMsg = "Thông tin đăng nhập không hợp lệ!";
+                    showToast(errMsg, "amber");
                 }
             }
         }
 
-        // Google Quick Login OAuth Handler
+        // Google Quick Login OAuth Handler with Detailed UI Catch logic
         async function handleGoogleLogin() {
             try {
                 showToast("Đang kết nối Google...", "emerald");
@@ -1811,7 +1810,21 @@
                 closeAuthModal();
             } catch (error) {
                 console.error("Google login failure:", error);
-                showToast("Kết nối Google thất bại!", "amber");
+                
+                let errorDetails = "Kết nối Google thất bại!";
+                if (error.code === 'auth/operation-not-allowed') {
+                    errorDetails = "Lỗi: Chưa kích hoạt nhà cung cấp Google trong mục Authentication của Firebase Console! Bạn cần chọn Email hỗ trợ rồi nhấn Save ở modal Firebase.";
+                } else if (error.code === 'auth/popup-blocked') {
+                    errorDetails = "Lỗi: Trình duyệt đã chặn cửa sổ Pop-up của Google. Hãy cho phép hiển thị pop-up!";
+                } else if (error.code === 'auth/unauthorized-domain') {
+                    errorDetails = "Lỗi: Tên miền này không nằm trong danh sách được phép đăng nhập (Authorized Domains) của Firebase!";
+                } else if (error.code === 'auth/popup-closed-by-user') {
+                    errorDetails = "Bạn đã đóng cửa sổ đăng nhập Google quá sớm.";
+                } else {
+                    errorDetails = `Mã lỗi Auth: ${error.code || 'unknown'} - ${error.message.substring(0, 50)}`;
+                }
+                
+                showToast(errorDetails, "amber");
             }
         }
 
@@ -1841,6 +1854,7 @@
             }
         }
 
+        // Authentication Event Observers
         onAuthStateChanged(auth, async (user) => {
             const userProfileBadge = document.getElementById('user-profile-badge');
             const headerUserName = document.getElementById('header-user-name');
@@ -1851,7 +1865,6 @@
             const authLoggedOutView = document.getElementById('auth-logged-out-view');
 
             if (user) {
-                // Update Badge Header information
                 const displayName = user.displayName || user.email?.split('@')[0] || "Khách Ẩn Danh";
                 headerUserName.textContent = displayName;
                 
@@ -1864,7 +1877,6 @@
                     userAvatarContainer.innerHTML = `<div class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">${displayName.charAt(0)}</div>`;
                 }
 
-                // Update Authentication Drawer UI elements
                 authLoggedInView.classList.remove('hidden');
                 authLoggedOutView.classList.add('hidden');
 
@@ -1875,10 +1887,8 @@
                 document.getElementById('profile-display-email').textContent = user.email || "Không có Email liên kết (Khách)";
                 document.getElementById('profile-auth-provider').textContent = user.isAnonymous ? "Trải Nghiệm Khách" : "Liên Kết Đám Mây";
 
-                // Synchronize and Fetch Cloud Profile Stats
                 await fetchCloudDataAndMerge(user);
             } else {
-                // UI state reset for guest and offline contexts
                 headerUserName.textContent = "Chưa Đăng Nhập";
                 headerSyncStatus.innerHTML = `<span class="w-1 h-1 rounded-full bg-amber-500"></span> Offline`;
                 headerSyncStatus.className = "text-[8px] text-amber-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5";
@@ -1887,7 +1897,7 @@
                 authLoggedInView.classList.add('hidden');
                 authLoggedOutView.classList.remove('hidden');
 
-                // MANDATORY RULE: Always signInAnonymously to authenticate before queries are accessible
+                // RULE 3: Initialize Anonymous authentication immediately
                 await signInAnonymously(auth);
             }
             lucide.createIcons();
