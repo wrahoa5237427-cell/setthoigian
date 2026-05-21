@@ -146,7 +146,7 @@
                     <div class="text-left hidden sm:block">
                         <div id="header-user-name" class="text-[10px] font-bold text-slate-800 dark:text-gray-200 leading-none">Chưa Đăng Nhập</div>
                         <div id="header-sync-status" class="text-[8px] text-amber-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5">
-                            <span class="w-1 h-1 rounded-full bg-amber-500"></span> Offline
+                            <span class="w-1 h-1 rounded-full bg-amber-500"></span> Đang tải...
                         </div>
                     </div>
                 </div>
@@ -347,7 +347,7 @@
                         </button>
                         <div class="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-gray-400 font-bold hidden sm:flex">
                             <span>Ít</span>
-                            <span class="w-3 h-3 rounded bg-slate-100 dark:bg-gray-900 border border-slate-200 dark:border-gray-805"></span>
+                            <span class="w-3 h-3 rounded bg-slate-100 dark:bg-gray-900 border border-slate-200 dark:border-gray-855"></span>
                             <span class="w-3 h-3 rounded bg-emerald-100/40 dark:bg-emerald-950/30 border border-emerald-200/40 dark:border-emerald-900/20"></span>
                             <span class="w-3 h-3 rounded bg-emerald-300/60 dark:bg-emerald-800/50 border border-emerald-400/50 dark:border-emerald-700/30"></span>
                             <span class="w-3 h-3 rounded bg-emerald-500/80 dark:bg-emerald-600/70 border border-emerald-500/70 dark:border-emerald-500/40"></span>
@@ -407,7 +407,7 @@
                     <!-- Add task form -->
                     <form id="task-form" onsubmit="addTask(event)" class="relative mb-5">
                         <input id="task-input" type="text" placeholder="Nhập mục tiêu khẩn cấp tiếp theo..." required class="w-full bg-slate-50 dark:bg-gray-950 border border-slate-300 dark:border-gray-900 focus:border-emerald-500/50 rounded-xl pl-4 pr-14 py-3.5 text-xs placeholder-slate-400 dark:placeholder-gray-500 focus:outline-none text-slate-800 dark:text-gray-100 font-medium transition-all">
-                        <button type="submit" class="absolute right-2 top-2 p-1.5 rounded-lg bg-white dark:bg-gray-900 hover:bg-slate-100 dark:hover:bg-gray-850 text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-gray-850 transition-all" title="Thêm nhiệm vụ">
+                        <button type="submit" class="absolute right-2 top-2 p-1.5 rounded-lg bg-white dark:bg-gray-900 hover:bg-slate-100 dark:hover:bg-gray-855 text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-gray-850 transition-all" title="Thêm nhiệm vụ">
                             <i data-lucide="plus" class="w-4.5 h-4.5"></i>
                         </button>
                     </form>
@@ -578,7 +578,7 @@
                         <button onclick="testTickSound()" class="py-2 px-3 bg-white dark:bg-gray-900 hover:bg-slate-50 dark:hover:bg-gray-850 text-slate-700 dark:text-gray-300 border border-slate-200 dark:border-gray-800 font-bold rounded-lg flex items-center justify-center gap-1.5 transition">
                             <i data-lucide="music" class="w-3.5 h-3.5"></i> Thử Tích Tắc
                         </button>
-                        <button onclick="testChimeSound()" class="py-2 px-3 bg-white dark:bg-gray-900 hover:bg-slate-50 dark:hover:bg-gray-850 text-slate-700 dark:text-gray-300 border border-slate-200 dark:border-gray-800 font-bold rounded-lg flex items-center justify-center gap-1.5 transition">
+                        <button onclick="testChimeSound()" class="py-2 px-3 bg-white dark:bg-gray-900 hover:bg-slate-50 dark:hover:bg-gray-855 text-slate-700 dark:text-gray-300 border border-slate-200 dark:border-gray-800 font-bold rounded-lg flex items-center justify-center gap-1.5 transition">
                             <i data-lucide="bell" class="w-3.5 h-3.5"></i> Thử Chuông Báo
                         </button>
                     </div>
@@ -770,14 +770,14 @@
             <p class="text-xs text-slate-500 dark:text-gray-400 mb-6 leading-relaxed">Bạn có thực sự muốn bắt đầu lại? Toàn bộ thống kê, cấp độ và lịch sử Heatmap sẽ mất vĩnh viễn.</p>
             
             <div class="flex gap-3">
-                <button onclick="closeResetModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-gray-900 hover:bg-slate-200 dark:hover:bg-gray-800 text-slate-600 dark:text-gray-300 font-bold text-xs uppercase tracking-wider border border-slate-200 dark:border-gray-850">Hủy</button>
+                <button onclick="closeResetModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-gray-900 hover:bg-slate-200 dark:hover:bg-gray-800 text-slate-600 dark:text-gray-300 font-bold text-xs uppercase tracking-wider border border-slate-200 dark:border-gray-855">Hủy</button>
                 <button onclick="executeResetAllData()" class="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg">Xóa Toàn Bộ</button>
             </div>
         </div>
     </div>
 
     <!-- Custom Toast Notification System -->
-    <div id="toast-notif" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-850 text-slate-800 dark:text-gray-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 z-[110] text-xs max-w-xs">
+    <div id="toast-notif" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-855 text-slate-800 dark:text-gray-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 z-[110] text-xs max-w-xs">
         <div id="toast-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
         <span id="toast-text" class="font-bold tracking-wide">Trạng thái rèn luyện</span>
     </div>
@@ -891,18 +891,30 @@
         };
 
         let tasks = [];
-        let stats = {
-            completedSessions: 0,
-            totalFocusMinutes: 0,
-            xp: 0,
-            level: 1,
-            streak: 0,
-            lastCompletedDateString: '', 
-            dailyActivity: {}, 
-            modeDistribution: { pomodoro: 0, english60: 0, math120: 0, continuous: 0 },
-            hourlyActivity: Array(24).fill(0),
-            activeTaskId: null
-        };
+        let stats = getEmptyStats();
+
+        function getEmptyStats() {
+            return {
+                completedSessions: 0,
+                totalFocusMinutes: 0,
+                xp: 0,
+                level: 1,
+                streak: 0,
+                lastCompletedDateString: '', 
+                dailyActivity: {}, 
+                modeDistribution: { pomodoro: 0, english60: 0, math120: 0, continuous: 0 },
+                hourlyActivity: Array(24).fill(0),
+                activeTaskId: null
+            };
+        }
+
+        // Reset dữ liệu RAM & LocalStorage khi đổi nick hoặc đăng xuất
+        function resetDataToDefault() {
+            tasks = [];
+            stats = getEmptyStats();
+            localStorage.removeItem('focusflow_stats');
+            localStorage.removeItem('focusflow_tasks');
+        }
 
         const motivationalQuotes = [
             "Kỷ luật là cầu nối giữa mục tiêu và thành tựu.",
@@ -1558,7 +1570,7 @@
                 li.className = `flex items-center justify-between p-3.5 rounded-xl border transition-all duration-300 bg-white dark:bg-gray-950/70 ${isSelected ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/5 shadow-[0_0_15px_rgba(16,185,129,0.05)]' : 'border-slate-200 dark:border-gray-900'}`;
                 li.innerHTML = `
                     <div class="flex items-center gap-3 flex-grow mr-2 max-w-[70%]">
-                        <button onclick="toggleTaskComplete('${t.id}')" class="w-5 h-5 rounded-md border flex items-center justify-center transition ${t.completed ? 'bg-emerald-500 border-emerald-400 text-white' : 'border-slate-300 dark:border-gray-800 hover:border-emerald-500/50'}" title="Đánh dấu hoàn thành">
+                        <button onclick="toggleTaskComplete('${t.id}')" class="w-5 h-5 rounded-md border flex items-center justify-center transition ${t.completed ? 'bg-emerald-500 border-emerald-400 text-white' : 'border-slate-300 dark:border-gray-805 hover:border-emerald-500/50'}" title="Đánh dấu hoàn thành">
                             ${t.completed ? '<i data-lucide="check" class="w-3.5 h-3.5 stroke-[4]"></i>' : ''}
                         </button>
                         <div class="flex flex-col">
@@ -1658,13 +1670,13 @@
             if (!user) return;
 
             try {
-                // RULE 1: Use specific artifacts subcollections path structure
-                const statsDocPath = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'stats');
-                const tasksDocPath = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'tasks');
+                const statsDocPath = doc(db, 'artifacts', appId, 'users', user.uid, 'userdata', 'stats');
+                const tasksDocPath = doc(db, 'artifacts', appId, 'users', user.uid, 'userdata', 'tasks');
 
                 await setDoc(statsDocPath, stats, { merge: true });
                 await setDoc(tasksDocPath, { list: tasks });
 
+                // Sửa đổi phần nhãn hiển thị trạng thái đồng bộ
                 document.getElementById('header-sync-status').innerHTML = `<span class="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span> Đã Đồng Bộ`;
                 document.getElementById('header-sync-status').className = "text-[8px] text-emerald-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5";
             } catch (error) {
@@ -1676,24 +1688,28 @@
         async function fetchCloudDataAndMerge(user) {
             if (!user) return;
             try {
-                // RULE 1: Use strictly predefined artifact path configurations
-                const statsDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'stats');
-                const tasksDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'tasks');
+                const statsDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'userdata', 'stats');
+                const tasksDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'userdata', 'tasks');
 
                 const statsSnap = await getDoc(statsDocRef);
                 const tasksSnap = await getDoc(tasksDocRef);
 
+                // QUAN TRỌNG: NẾU ACCOUNT TRÊN CLOUD CHƯA CÓ GÌ, PHẢI XÓA SẠCH DỮ LIỆU CỦA MÁY ĐỂ KHÔNG BÌNH DÂN GHÉP LỘN DỮ LIỆU
                 if (statsSnap.exists()) {
-                    stats = statsSnap.data();
+                    stats = { ...getEmptyStats(), ...statsSnap.data() };
                 } else {
+                    stats = getEmptyStats();
                     await setDoc(statsDocRef, stats);
                 }
 
                 if (tasksSnap.exists()) {
                     tasks = tasksSnap.data().list || [];
                 } else {
+                    tasks = [];
                     await setDoc(tasksDocRef, { list: tasks });
                 }
+
+                saveLocalFallback(); // Ép máy tính lưu đè đúng dữ liệu của tài khoản Google này!
 
                 renderTasks();
                 evaluateStreakAndCheck();
@@ -1725,8 +1741,22 @@
         function openResetModal() { document.getElementById('reset-modal').classList.remove('hidden'); }
         function closeResetModal() { document.getElementById('reset-modal').classList.add('hidden'); }
         
-        function executeResetAllData() {
+        async function executeResetAllData() {
             localStorage.clear();
+            resetDataToDefault();
+            
+            // Xóa cả trên Cloud nếu đang đăng nhập
+            if (auth.currentUser) {
+                try {
+                    const statsDocPath = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'userdata', 'stats');
+                    const tasksDocPath = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'userdata', 'tasks');
+                    await setDoc(statsDocPath, getEmptyStats());
+                    await setDoc(tasksDocPath, { list: [] });
+                } catch (e) {
+                    console.error("Lỗi khi xóa cloud data", e);
+                }
+            }
+            
             showToast("Đã dọn sạch dữ liệu.", "amber");
             setTimeout(() => { window.location.reload(); }, 1000);
         }
@@ -1841,13 +1871,26 @@
             }
         }
 
-        // Sign Out Handler
+        // Sign Out Handler - Dọn dẹp RAM ngay lập tức và đưa về Anonymous
         async function handleLogout() {
             try {
                 showToast("Đang đăng xuất khỏi hệ thống...", "amber");
                 await signOut(auth);
+                
+                // XÓA SẠCH VẾT TÍCH TRÊN TRÌNH DUYỆT CỐC CỐC
+                resetDataToDefault();
+                
+                renderTasks();
+                evaluateStreakAndCheck();
+                levelCheckAndCalculation();
+                generateActivityHeatmap();
+                updateMotivationUI();
+                
                 showToast("Đã đăng xuất tài khoản.", "emerald");
                 closeAuthModal();
+                
+                // Kích hoạt ngay tài khoản khách ẩn danh mới, không giữ lại rác của nick vừa thoát
+                await signInAnonymously(auth);
             } catch (error) {
                 console.error("Sign out failure:", error);
                 showToast("Đăng xuất thất bại!", "amber");
@@ -1856,6 +1899,8 @@
 
         // Authentication Event Observers
         onAuthStateChanged(auth, async (user) => {
+            // Sửa lỗi cực kỳ ngốc nghếch: nếu user đăng xuất (user == null), 
+            // KHÔNG ĐƯỢC CHẶN đứng bằng dòng 'if (!user) return' nữa mà phải reset giao diện!
             const userProfileBadge = document.getElementById('user-profile-badge');
             const headerUserName = document.getElementById('header-user-name');
             const headerSyncStatus = document.getElementById('header-sync-status');
@@ -1864,19 +1909,38 @@
             const authLoggedInView = document.getElementById('auth-logged-in-view');
             const authLoggedOutView = document.getElementById('auth-logged-out-view');
 
-            if (user) {
-                const displayName = user.displayName || user.email?.split('@')[0] || "Khách Ẩn Danh";
-                headerUserName.textContent = displayName;
-                
-                headerSyncStatus.innerHTML = `<span class="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span> Trực tuyến`;
+            if (!user) {
+                // Trạng thái đã đăng xuất / Khách vô danh chưa khởi tạo xong
+                headerUserName.textContent = "Chưa Đăng Nhập";
+                headerSyncStatus.innerHTML = `<span class="w-1 h-1 rounded-full bg-amber-500"></span> Offline`;
+                headerSyncStatus.className = "text-[8px] text-amber-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5";
+                userAvatarContainer.innerHTML = `<i data-lucide="user" class="w-3.5 h-3.5 text-slate-600 dark:text-gray-300"></i>`;
+                authLoggedInView.classList.add('hidden');
+                authLoggedOutView.classList.remove('hidden');
+                lucide.createIcons();
+                return;
+            }
+
+            const displayName = user.displayName || user.email?.split('@')[0] || "Khách Ẩn Danh";
+            headerUserName.textContent = displayName;
+
+            if (user.photoURL) {
+                userAvatarContainer.innerHTML = `<img src="${user.photoURL}" class="w-full h-full object-cover">`;
+            } else {
+                userAvatarContainer.innerHTML = `<div class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">${displayName.charAt(0)}</div>`;
+            }
+
+            if (user.isAnonymous) {
+                // Đang là phiên khách
+                headerSyncStatus.innerHTML = `<span class="w-1 h-1 rounded-full bg-amber-500"></span> Chế độ Khách`;
+                headerSyncStatus.className = "text-[8px] text-amber-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5";
+                authLoggedInView.classList.add('hidden');
+                authLoggedOutView.classList.remove('hidden');
+            } else {
+                // Đã đăng nhập tài khoản thực sự (Google / Email)
+                headerSyncStatus.innerHTML = `<span class="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span> Đang đồng bộ...`;
                 headerSyncStatus.className = "text-[8px] text-emerald-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5";
-
-                if (user.photoURL) {
-                    userAvatarContainer.innerHTML = `<img src="${user.photoURL}" class="w-full h-full object-cover">`;
-                } else {
-                    userAvatarContainer.innerHTML = `<div class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">${displayName.charAt(0)}</div>`;
-                }
-
+                
                 authLoggedInView.classList.remove('hidden');
                 authLoggedOutView.classList.add('hidden');
 
@@ -1884,24 +1948,27 @@
                     `<img src="${user.photoURL}" class="w-full h-full rounded-full object-cover">` : 
                     displayName.charAt(0);
                 document.getElementById('profile-display-name').textContent = displayName;
-                document.getElementById('profile-display-email').textContent = user.email || "Không có Email liên kết (Khách)";
-                document.getElementById('profile-auth-provider').textContent = user.isAnonymous ? "Trải Nghiệm Khách" : "Liên Kết Đám Mây";
-
-                await fetchCloudDataAndMerge(user);
-            } else {
-                headerUserName.textContent = "Chưa Đăng Nhập";
-                headerSyncStatus.innerHTML = `<span class="w-1 h-1 rounded-full bg-amber-500"></span> Offline`;
-                headerSyncStatus.className = "text-[8px] text-amber-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5";
-                userAvatarContainer.innerHTML = `<i data-lucide="user" class="w-3.5 h-3.5 text-slate-600 dark:text-gray-300"></i>`;
-
-                authLoggedInView.classList.add('hidden');
-                authLoggedOutView.classList.remove('hidden');
-
-                // RULE 3: Initialize Anonymous authentication immediately
-                await signInAnonymously(auth);
+                document.getElementById('profile-display-email').textContent = user.email || "Không có Email liên kết";
+                document.getElementById('profile-auth-provider').textContent = "Liên Kết Đám Mây";
             }
+
+            // Kéo dữ liệu từ đám mây của chính tài khoản này xuống máy khách và cập nhật giao diện
+            await fetchCloudDataAndMerge(user);
             lucide.createIcons();
         });
+
+        // HÀM KHỞI TẠO XÁC THỰC - CHUẨN FIREBASE
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else if (!auth.currentUser) {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) {
+                console.error("Auth init failed", e);
+            }
+        };
 
         window.toggleTheme = toggleTheme;
         window.setMode = setMode;
@@ -1933,6 +2000,9 @@
         window.handleGoogleLogin = handleGoogleLogin;
         window.handleGuestLogin = handleGuestLogin;
         window.handleLogout = handleLogout;
+
+        // Chạy khởi tạo Auth ngay lập tức
+        initAuth();
 
         window.onload = function() {
             updateThemeIcon();
