@@ -333,6 +333,11 @@
         <!-- RIGHT COLUMN: Anki Heatmap & Advanced Task Analytics (7 Cols) -->
         <section class="lg:col-span-7 flex flex-col space-y-6">
             
+            <!-- Floating Pinned Event Highlight Banner -->
+            <div id="pinned-event-banner" class="w-full transition-all duration-300">
+                <!-- Loaded Dynamically by JS -->
+            </div>
+
             <!-- Anki Heatmap Panel -->
             <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-gray-900 rounded-2xl p-5 shadow-xl dark:shadow-2xl backdrop-blur-md relative">
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 border-b border-slate-200 dark:border-gray-900 pb-3">
@@ -390,6 +395,45 @@
                 </div>
             </div>
 
+            <!-- Countdown Events & Important Targets Panel -->
+            <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-gray-900 rounded-2xl p-5 shadow-xl dark:shadow-2xl backdrop-blur-md">
+                <div class="flex justify-between items-center mb-4 border-b border-slate-200 dark:border-gray-900 pb-3">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="hourglass" class="w-4.5 h-4.5 text-indigo-600 dark:text-indigo-400"></i>
+                        <div>
+                            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-gray-200">Sự kiện & Mốc Thời Gian</h2>
+                            <p class="text-[9px] text-slate-500 dark:text-gray-500">Đếm ngược chính xác đến ngày kiểm tra, ngày thi, nộp đề án quan trọng</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleAddEventForm()" class="text-[10px] bg-slate-100 hover:bg-slate-200 dark:bg-gray-900 dark:hover:bg-gray-800 px-2.5 py-1.5 rounded-lg font-bold text-slate-700 dark:text-gray-300 transition flex items-center gap-1">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> Thêm sự kiện
+                    </button>
+                </div>
+
+                <!-- Add Event Slide-down Form -->
+                <form id="event-form" onsubmit="addEvent(event)" class="relative mb-5 hidden space-y-3 p-3.5 bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-xl transition-all">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="space-y-1">
+                            <label class="text-[9px] uppercase tracking-widest text-slate-500 dark:text-gray-400 font-bold px-1">Tên sự kiện</label>
+                            <input id="event-name" type="text" placeholder="Ví dụ: Thi THPT Quốc Gia, IELTS, Cuối Kỳ..." required class="w-full bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-gray-100 focus:outline-none focus:border-indigo-500/50">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[9px] uppercase tracking-widest text-slate-500 dark:text-gray-400 font-bold px-1">Mốc thời gian diễn ra</label>
+                            <input id="event-date" type="datetime-local" required class="w-full bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-gray-100 focus:outline-none focus:border-indigo-500/50">
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-1">
+                        <button type="button" onclick="toggleAddEventForm()" class="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-gray-900 text-slate-600 dark:text-gray-400">Hủy bỏ</button>
+                        <button type="submit" class="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-indigo-500 text-white shadow-lg shadow-indigo-500/10">Lưu lại</button>
+                    </div>
+                </form>
+
+                <!-- Events List Container -->
+                <div id="events-list" class="space-y-3 max-h-48 overflow-y-auto pr-1">
+                    <!-- Loaded dynamically by JS -->
+                </div>
+            </div>
+
             <!-- Task Board With Targeted Time Analytics -->
             <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-gray-900 rounded-2xl p-6 flex-grow flex flex-col justify-between shadow-xl dark:shadow-2xl min-h-[350px]">
                 <div>
@@ -413,7 +457,7 @@
                     </form>
 
                     <!-- Tasks List Container -->
-                    <div id="tasks-list" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                    <div id="tasks-list" class="space-y-3 max-h-72 overflow-y-auto pr-1">
                         <!-- Loaded dynamically -->
                     </div>
                 </div>
@@ -434,9 +478,47 @@
         </section>
     </main>
 
+    <!-- TASK EDIT & DAILY MINIMUM TARGET MODAL -->
+    <div id="task-edit-modal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 dark:bg-gray-950/90 backdrop-blur-md hidden transition-all duration-300">
+        <div class="bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative overflow-hidden flex flex-col">
+            <!-- Background lights -->
+            <div class="absolute -right-20 -bottom-20 w-44 h-44 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex justify-between items-center mb-6 border-b border-slate-150 dark:border-gray-900 pb-3 relative z-10">
+                <div class="flex items-center gap-2.5">
+                    <i data-lucide="edit-3" class="w-5 h-5 text-indigo-500"></i>
+                    <h3 class="text-xs font-bold text-slate-800 dark:text-gray-100 uppercase tracking-widest">Thiết lập mục tiêu chuyên sâu</h3>
+                </div>
+                <button onclick="closeEditTaskModal()" class="text-slate-400 hover:text-slate-600 dark:text-gray-500 dark:hover:text-gray-300 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <form onsubmit="saveTaskEdit(event)" class="space-y-4 relative z-10">
+                <input type="hidden" id="edit-task-id">
+                
+                <div class="space-y-1">
+                    <label class="text-[9px] uppercase tracking-widest text-slate-500 dark:text-gray-400 font-bold px-1">Tên mục tiêu / Nhiệm vụ</label>
+                    <input id="edit-task-name" type="text" required class="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-xl px-4 py-3 text-xs text-slate-800 dark:text-gray-100 focus:outline-none focus:border-indigo-500/50 font-medium">
+                </div>
+                
+                <div class="space-y-1">
+                    <label class="text-[9px] uppercase tracking-widest text-slate-500 dark:text-gray-400 font-bold px-1">Mục tiêu học tối thiểu mỗi ngày (Phút)</label>
+                    <input id="edit-task-goal" type="number" min="0" max="1440" placeholder="Ví dụ: 30, 45, 60... (0 để tắt)" class="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-xl px-4 py-3 text-xs text-slate-800 dark:text-gray-100 focus:outline-none focus:border-indigo-500/50 font-medium">
+                    <span class="text-[9px] text-slate-400 dark:text-gray-500 block px-1">Đặt mốc thời gian tối thiểu bạn cần tập trung rèn luyện cho mục tiêu này mỗi ngày.</span>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeEditTaskModal()" class="flex-1 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-gray-900 dark:hover:bg-gray-800 text-slate-600 dark:text-gray-300 font-bold text-xs uppercase tracking-wider">Hủy bỏ</button>
+                    <button type="submit" class="flex-1 py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg transition">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- FIREBASE AUTHENTICATION MODAL -->
     <div id="auth-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 dark:bg-gray-950/90 backdrop-blur-md hidden transition-all duration-300">
-        <div class="bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative overflow-hidden flex flex-col">
+        <div class="bg-white dark:bg-gray-955 border border-slate-200 dark:border-gray-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative overflow-hidden flex flex-col">
             <!-- Decorative light effects -->
             <div class="absolute -right-20 -bottom-20 w-44 h-44 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -left-20 -top-20 w-44 h-44 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -464,7 +546,7 @@
                     <span id="profile-auth-provider" class="text-[9px] bg-indigo-100 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/30 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Đăng nhập ẩn danh</span>
                 </div>
 
-                <div class="bg-slate-50 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-850 p-4 rounded-2xl text-left space-y-2">
+                <div class="bg-slate-50 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-855 p-4 rounded-2xl text-left space-y-2">
                     <span class="text-[9px] text-slate-400 dark:text-gray-500 uppercase font-black tracking-widest block">Trạng thái đám mây</span>
                     <div class="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
                         <i data-lucide="cloud-lightning" class="w-4 h-4 animate-bounce"></i>
@@ -514,7 +596,7 @@
                     
                     <div class="space-y-1">
                         <label class="text-[9px] uppercase tracking-widest text-slate-500 dark:text-gray-400 font-bold px-1">Mật khẩu</label>
-                        <input id="auth-password" type="password" placeholder="••••••••" required class="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-xl px-4 py-3 text-xs text-slate-800 dark:text-gray-100 focus:outline-none focus:border-emerald-500/50 font-medium">
+                        <input id="auth-password" type="password" placeholder="••••••••" required class="w-full bg-slate-50 dark:bg-gray-955 border border-slate-200 dark:border-gray-900 rounded-xl px-4 py-3 text-xs text-slate-800 dark:text-gray-100 focus:outline-none focus:border-emerald-500/50 font-medium">
                     </div>
 
                     <!-- Confirm Password (Only visible in Register mode) -->
@@ -540,7 +622,7 @@
 
     <!-- SYSTEM SETTINGS MODAL -->
     <div id="settings-modal" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/50 dark:bg-gray-950/80 backdrop-blur-md hidden transition-opacity duration-300">
-        <div class="bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-2xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden flex flex-col">
+        <div class="bg-white dark:bg-gray-955 border border-slate-200 dark:border-gray-900 rounded-2xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden flex flex-col">
             <div class="absolute -right-12 -bottom-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-2xl"></div>
 
             <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-200 dark:border-gray-900">
@@ -612,7 +694,7 @@
                         Vùng nhạy cảm
                     </span>
                     <p class="text-[10px] text-slate-500 dark:text-gray-400 leading-relaxed">Xóa vĩnh viễn toàn bộ lịch sử rèn luyện, Heatmap học tập và cấp độ hiện tại của bạn.</p>
-                    <button onclick="openResetModal()" class="w-full py-2 bg-red-100 hover:bg-red-200 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-200/40 dark:border-red-900/30 font-bold rounded-lg transition uppercase tracking-wider text-[10px]">
+                    <button onclick="openResetModal()" class="w-full py-2 bg-red-100 hover:bg-red-200 dark:bg-red-955/20 text-red-700 dark:text-red-400 border border-red-200/40 dark:border-red-900/30 font-bold rounded-lg transition uppercase tracking-wider text-[10px]">
                         Xóa toàn bộ dữ liệu ứng dụng
                     </button>
                 </div>
@@ -627,7 +709,7 @@
 
     <!-- Advanced Stats Modal -->
     <div id="stats-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 dark:bg-gray-950/80 backdrop-blur-md hidden transition-opacity duration-300">
-        <div class="bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="bg-white dark:bg-gray-955 border border-slate-200 dark:border-gray-900 rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
             <div class="absolute -left-20 -top-20 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
             
             <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-200 dark:border-gray-900">
@@ -726,7 +808,7 @@
 
     <!-- Custom Guide Modal -->
     <div id="guide-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 dark:bg-gray-950/80 backdrop-blur-sm hidden transition-opacity duration-300">
-        <div class="bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative overflow-hidden">
+        <div class="bg-white dark:bg-gray-955 border border-slate-200 dark:border-gray-900 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative overflow-hidden">
             <div class="absolute -right-16 -top-16 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
             
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-200 dark:border-gray-900">
@@ -745,12 +827,12 @@
                     <p class="leading-relaxed">Nhấp vào thẻ <strong class="text-emerald-600 dark:text-emerald-400">Tài khoản</strong> ở góc phải phía trên để đăng nhập Google hoặc Email. Hệ thống sẽ tự động đồng bộ hóa tất cả tiến trình học, điểm XP và lịch sử của bạn.</p>
                 </div>
                 <div>
-                    <span class="text-emerald-600 dark:text-emerald-400 font-bold block mb-1">2. Quản lý tác vụ liên thông</span>
-                    <p class="leading-relaxed">Khi tạo một nhiệm vụ mới, hãy bấm biểu tượng <strong class="text-emerald-600 dark:text-emerald-400">"Mục tiêu"</strong> để kết nối trực tiếp với đồng hồ đếm. Thời gian học tích lũy sẽ cộng dồn chuẩn xác vào mục tiêu đó.</p>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold block mb-1">2. Quản lý tác vụ liên thông & Mục tiêu ngày</span>
+                    <p class="leading-relaxed">Khi tạo một nhiệm vụ mới, hãy bấm biểu tượng <strong class="text-emerald-600 dark:text-emerald-400">"Mục tiêu"</strong> để kết nối trực tiếp với đồng hồ đếm. Bấm biểu tượng bút để chỉnh sửa tên mục tiêu và thời lượng học tối thiểu mong muốn mỗi ngày.</p>
                 </div>
                 <div>
-                    <span class="text-emerald-600 dark:text-emerald-400 font-bold block mb-1">3. Giả lập tích hợp</span>
-                    <p class="leading-relaxed">Chế độ giả lập phòng thi tăng cường áp lực làm bài với nhịp gõ tích tắc, đem lại khả năng tập trung toàn phần lý tưởng.</p>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold block mb-1">3. Giả lập tích hợp & Countdown</span>
+                    <p class="leading-relaxed">Chế độ giả lập phòng thi tăng cường áp lực làm bài với nhịp gõ tích tắc. Thiết lập các mốc thời gian thi cử, ghim sự kiện quan trọng để luôn duy trì ngọn lửa kỷ luật bền bỉ.</p>
                 </div>
             </div>
 
@@ -762,8 +844,8 @@
 
     <!-- Custom Data Reset Modal -->
     <div id="reset-modal" class="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-900/50 dark:bg-gray-950/85 backdrop-blur-sm hidden">
-        <div class="bg-white dark:bg-gray-950 border border-red-200 dark:border-red-900/50 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative text-center">
-            <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-950/40 text-red-500 dark:text-red-400 flex items-center justify-center mx-auto mb-4 border border-red-200 dark:border-red-900/30">
+        <div class="bg-white dark:bg-gray-955 border border-red-200 dark:border-red-900/50 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative text-center">
+            <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-955/40 text-red-500 dark:text-red-400 flex items-center justify-center mx-auto mb-4 border border-red-200 dark:border-red-900/30">
                 <i data-lucide="alert-triangle" class="w-6 h-6 animate-bounce"></i>
             </div>
             <h3 class="text-sm font-bold text-slate-800 dark:text-gray-100 uppercase tracking-wider mb-2">Cảnh báo xóa dữ liệu!</h3>
@@ -777,7 +859,7 @@
     </div>
 
     <!-- Custom Toast Notification System -->
-    <div id="toast-notif" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-855 text-slate-800 dark:text-gray-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 z-[110] text-xs max-w-xs">
+    <div id="toast-notif" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 bg-white dark:bg-gray-955 border border-slate-200 dark:border-gray-855 text-slate-800 dark:text-gray-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 z-[110] text-xs max-w-xs">
         <div id="toast-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
         <span id="toast-text" class="font-bold tracking-wide">Trạng thái rèn luyện</span>
     </div>
@@ -904,7 +986,8 @@
                 dailyActivity: {}, 
                 modeDistribution: { pomodoro: 0, english60: 0, math120: 0, continuous: 0 },
                 hourlyActivity: Array(24).fill(0),
-                activeTaskId: null
+                activeTaskId: null,
+                events: [] // Array of Custom Upcoming Events {id, name, date, pinned, createdAt}
             };
         }
 
@@ -954,7 +1037,7 @@
         const streakCount = document.getElementById('streak-count');
         const timerCard = document.getElementById('timer-card');
 
-        // Realtime Clock setup
+        // Realtime Clock setup (Vietnam Localized Clock)
         function updateVietnamClock() {
             const clockEl = document.getElementById('vietnam-clock');
             if(!clockEl) return;
@@ -963,6 +1046,9 @@
             const mins = String(now.getMinutes()).padStart(2, '0');
             const secs = String(now.getSeconds()).padStart(2, '0');
             clockEl.textContent = `${hrs}:${mins}:${secs}`;
+
+            // Sync: Countdown ticking inside the active timer clock tick!
+            updateAllCountdowns();
         }
         setInterval(updateVietnamClock, 1000);
         updateVietnamClock();
@@ -1471,7 +1557,11 @@
 
             if (['pomodoro', 'english60', 'math120', 'continuous'].includes(timerState.mode) && stats.activeTaskId) {
                 const actTask = tasks.find(t => t.id === stats.activeTaskId);
-                if (actTask) { actTask.focusSeconds = (actTask.focusSeconds || 0) + 1; renderTasks(); saveDataToStorage(); }
+                if (actTask) { 
+                    actTask.focusSeconds = (actTask.focusSeconds || 0) + 1; 
+                    renderTasks(); 
+                    saveDataToStorage(); 
+                }
             }
             updateDisplay();
         }
@@ -1547,7 +1637,14 @@
 
         function addTask(event) {
             event.preventDefault(); const text = taskInput.value.trim(); if (!text) return;
-            const newTask = { id: crypto.randomUUID(), text: text, completed: false, focusSeconds: 0, createdAt: new Date().toISOString() };
+            const newTask = { 
+                id: crypto.randomUUID(), 
+                text: text, 
+                completed: false, 
+                focusSeconds: 0, 
+                dailyGoalMinutes: 0, // Default 0 means no minimum daily limit
+                createdAt: new Date().toISOString() 
+            };
             tasks.push(newTask); taskInput.value = "";
             if (tasks.length === 1 || !stats.activeTaskId) stats.activeTaskId = newTask.id;
             renderTasks(); saveDataToStorage(); showToast("Đã thêm nhiệm vụ mới.", "emerald");
@@ -1569,6 +1666,39 @@
             const m = Math.floor(seconds / 60); const s = seconds % 60;
             return m > 0 ? `${m}p ${s}s` : `${s} giây`;
         }
+
+        // --- TASK EDITING & GOAL CONTROLLER ---
+        function openEditTaskModal(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+            document.getElementById('edit-task-id').value = id;
+            document.getElementById('edit-task-name').value = task.text;
+            document.getElementById('edit-task-goal').value = task.dailyGoalMinutes || 0;
+            document.getElementById('task-edit-modal').classList.remove('hidden');
+        }
+
+        function closeEditTaskModal() {
+            document.getElementById('task-edit-modal').classList.add('hidden');
+        }
+
+        function saveTaskEdit(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-task-id').value;
+            const name = document.getElementById('edit-task-name').value.trim();
+            const goal = parseInt(document.getElementById('edit-task-goal').value) || 0;
+            if (!name) return;
+
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.text = name;
+                task.dailyGoalMinutes = goal;
+                renderTasks();
+                saveDataToStorage();
+                closeEditTaskModal();
+                showToast("Đã cập nhật mục tiêu rèn luyện!", "emerald");
+            }
+        }
+
         function renderTasks() {
             if (!tasksList) return;
             tasksList.innerHTML = ""; let completedCount = 0;
@@ -1576,22 +1706,50 @@
 
             sortedTasks.forEach(t => {
                 if (t.completed) completedCount++; const isSelected = stats.activeTaskId === t.id;
+                
+                // Progress Bar calculation for tasks with Minimum Daily Target
+                const dailyGoalMinutes = t.dailyGoalMinutes || 0;
+                let progressHtml = '';
+                if (dailyGoalMinutes > 0) {
+                    const goalSeconds = dailyGoalMinutes * 60;
+                    const progressPercent = Math.min(100, Math.round((t.focusSeconds / goalSeconds) * 100));
+                    progressHtml = `
+                        <div class="mt-2.5 w-full">
+                            <div class="flex justify-between items-center text-[9px] text-slate-500 dark:text-gray-400 font-bold mb-1">
+                                <span class="flex items-center gap-1"><i data-lucide="target" class="w-3 h-3 text-indigo-500"></i> Mục tiêu: ${dailyGoalMinutes} phút / ngày</span>
+                                <span>${progressPercent}% (${Math.round(t.focusSeconds / 60)}p)</span>
+                            </div>
+                            <div class="w-full bg-slate-100 dark:bg-gray-900 h-1 rounded-full overflow-hidden">
+                                <div class="bg-indigo-500 h-full rounded-full transition-all duration-300" style="width: ${progressPercent}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }
+
                 const li = document.createElement('div');
-                li.className = `flex items-center justify-between p-3.5 rounded-xl border transition-all duration-300 bg-white dark:bg-gray-950/70 ${isSelected ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/5 shadow-[0_0_15px_rgba(16,185,129,0.05)]' : 'border-slate-200 dark:border-gray-900'}`;
+                li.className = `flex flex-col p-3.5 rounded-xl border transition-all duration-300 bg-white dark:bg-gray-950/70 ${isSelected ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/5 shadow-[0_0_15px_rgba(16,185,129,0.05)]' : 'border-slate-200 dark:border-gray-900'}`;
                 li.innerHTML = `
-                    <div class="flex items-center gap-3 flex-grow mr-2 max-w-[70%]">
-                        <button onclick="toggleTaskComplete('${t.id}')" class="w-5 h-5 rounded-md border flex items-center justify-center transition ${t.completed ? 'bg-emerald-500 border-emerald-400 text-white' : 'border-slate-300 dark:border-gray-855 hover:border-emerald-500/50'}" title="Đánh dấu hoàn thành">
-                            ${t.completed ? '<i data-lucide="check" class="w-3.5 h-3.5 stroke-[4]"></i>' : ''}
-                        </button>
-                        <div class="flex flex-col">
-                            <span class="text-xs font-semibold ${t.completed ? 'line-through text-slate-400 dark:text-gray-500' : 'text-slate-800 dark:text-gray-200'}">${t.text}</span>
-                            <span class="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold mt-1 tracking-wide flex items-center gap-1"><i data-lucide="history" class="w-3 h-3 text-emerald-500/80"></i> Đã học: ${formatFocusDuration(t.focusSeconds)}</span>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 flex-grow mr-2 max-w-[70%]">
+                            <button onclick="toggleTaskComplete('${t.id}')" class="w-5 h-5 rounded-md border flex items-center justify-center transition ${t.completed ? 'bg-emerald-500 border-emerald-400 text-white' : 'border-slate-300 dark:border-gray-855 hover:border-emerald-500/50'}" title="Đánh dấu hoàn thành">
+                                ${t.completed ? '<i data-lucide="check" class="w-3.5 h-3.5 stroke-[4]"></i>' : ''}
+                            </button>
+                            <div class="flex flex-col">
+                                <span class="text-xs font-semibold ${t.completed ? 'line-through text-slate-400 dark:text-gray-500' : 'text-slate-800 dark:text-gray-200'}">${t.text}</span>
+                                <span class="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold mt-1 tracking-wide flex items-center gap-1"><i data-lucide="history" class="w-3 h-3 text-emerald-500/80"></i> Đã học: ${formatFocusDuration(t.focusSeconds)}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            ${!t.completed ? `<button onclick="selectActiveTask('${t.id}')" class="px-2.5 py-1.5 rounded-lg text-[9px] font-extrabold uppercase tracking-wider border transition-all ${isSelected ? 'bg-emerald-500 text-white border-emerald-400 shadow-sm' : 'bg-slate-100 dark:bg-gray-900 border-slate-200 dark:border-gray-800 hover:bg-slate-200 text-emerald-600 dark:text-emerald-400'}">${isSelected ? 'Đang chạy' : 'Mục tiêu'}</button>` : ''}
+                            ${!t.completed ? `
+                                <button onclick="openEditTaskModal('${t.id}')" class="p-2 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 rounded-lg transition" title="Chỉnh sửa mục tiêu & thời lượng">
+                                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                </button>
+                            ` : ''}
+                            <button onclick="deleteTask('${t.id}')" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>
                     </div>
-                    <div class="flex items-center gap-1.5 shrink-0">
-                        ${!t.completed ? `<button onclick="selectActiveTask('${t.id}')" class="px-2.5 py-1.5 rounded-lg text-[9px] font-extrabold uppercase tracking-wider border transition-all ${isSelected ? 'bg-emerald-500 text-white border-emerald-400 shadow-sm' : 'bg-slate-100 dark:bg-gray-900 border-slate-200 dark:border-gray-800 hover:bg-slate-200 text-emerald-600 dark:text-emerald-400'}">${isSelected ? 'Đang chạy' : 'Mục tiêu'}</button>` : ''}
-                        <button onclick="deleteTask('${t.id}')" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>
+                    ${progressHtml}
                 `;
                 tasksList.appendChild(li);
             });
@@ -1607,6 +1765,215 @@
                 stats.activeTaskId = null;
             }
             lucide.createIcons();
+        }
+
+        // --- CUSTOM EVENT COUNTDOWN SYSTEM ---
+        function toggleAddEventForm() {
+            const form = document.getElementById('event-form');
+            if (form) form.classList.toggle('hidden');
+        }
+
+        function addEvent(e) {
+            e.preventDefault();
+            const name = document.getElementById('event-name').value.trim();
+            const date = document.getElementById('event-date').value;
+            if (!name || !date) return;
+
+            if (!stats.events) stats.events = [];
+
+            const newEvent = {
+                id: crypto.randomUUID(),
+                name,
+                date,
+                pinned: stats.events.length === 0, // Auto pin the first created event
+                createdAt: new Date().toISOString()
+            };
+
+            stats.events.push(newEvent);
+            document.getElementById('event-name').value = '';
+            document.getElementById('event-date').value = '';
+            toggleAddEventForm();
+            renderEvents();
+            saveDataToStorage();
+            showToast("Đã thiết lập countdown cho mốc sự kiện mới!", "emerald");
+        }
+
+        function deleteEvent(id) {
+            const wasPinned = stats.events.find(e => e.id === id)?.pinned;
+            stats.events = stats.events.filter(e => e.id !== id);
+            
+            // Auto-pin another event if we deleted the pinned one
+            if (wasPinned && stats.events.length > 0) {
+                stats.events[0].pinned = true;
+            }
+            renderEvents();
+            saveDataToStorage();
+            showToast("Đã hủy bỏ mốc đếm ngược sự kiện.", "amber");
+        }
+
+        function pinEvent(id) {
+            stats.events.forEach(e => {
+                e.pinned = (e.id === id);
+            });
+            renderEvents();
+            saveDataToStorage();
+            showToast("Đã ghim mốc sự kiện này lên tiêu điểm!", "emerald");
+        }
+
+        function getTimeRemaining(dateStr) {
+            const total = Date.parse(dateStr) - Date.parse(new Date());
+            if (total <= 0) {
+                return {
+                    total,
+                    days: 0,
+                    hours: 0,
+                    minutes: 0,
+                    seconds: 0,
+                    expired: true
+                };
+            }
+            const seconds = Math.floor((total / 1000) % 60);
+            const minutes = Math.floor((total / 1000 / 60) % 60);
+            const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+            const days = Math.floor(total / (1000 * 60 * 60 * 24));
+            return {
+                total,
+                days,
+                hours,
+                minutes,
+                seconds,
+                expired: false
+            };
+        }
+
+        function updateAllCountdowns() {
+            // Update Top Pinned banner
+            const banner = document.getElementById('pinned-event-banner');
+            if (banner) {
+                const pinned = stats.events ? stats.events.find(e => e.pinned) : null;
+                if (pinned) {
+                    const time = getTimeRemaining(pinned.date);
+                    if (time.expired) {
+                        banner.innerHTML = `
+                            <div class="bg-gradient-to-r from-red-500/10 to-amber-500/10 border border-red-200 dark:border-red-900/50 rounded-xl p-4 flex justify-between items-center shadow-lg">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 animate-pulse">
+                                        <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 dark:text-gray-100 text-xs">${pinned.name}</h4>
+                                        <span class="text-[9px] text-red-600 dark:text-red-400 font-extrabold uppercase mt-1">Sự kiện đã diễn ra!</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        banner.innerHTML = `
+                            <div class="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-200 dark:border-indigo-900/50 rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-[0_0_15px_rgba(99,102,241,0.08)]">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500 animate-pulse">
+                                        <i data-lucide="bell-ring" class="w-5 h-5"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <span class="text-[9px] bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Tiêu điểm ôn thi</span>
+                                        <h4 class="font-extrabold text-slate-800 dark:text-gray-50 text-xs mt-1.5">${pinned.name}</h4>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2.5 timer-font">
+                                    <div class="text-center bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-lg px-2 py-1"><span class="text-sm font-black text-indigo-600 dark:text-indigo-400">${time.days}</span><span class="text-[8px] text-slate-400 block font-bold uppercase">Ngày</span></div>
+                                    <span class="font-bold text-slate-400">:</span>
+                                    <div class="text-center bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-lg px-2 py-1"><span class="text-sm font-black text-indigo-600 dark:text-indigo-400">${String(time.hours).padStart(2,'0')}</span><span class="text-[8px] text-slate-400 block font-bold uppercase">Giờ</span></div>
+                                    <span class="font-bold text-slate-400">:</span>
+                                    <div class="text-center bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-lg px-2 py-1"><span class="text-sm font-black text-indigo-600 dark:text-indigo-400">${String(time.minutes).padStart(2,'0')}</span><span class="text-[8px] text-slate-400 block font-bold uppercase">Phút</span></div>
+                                    <span class="font-bold text-slate-400">:</span>
+                                    <div class="text-center bg-white dark:bg-gray-900/80 border border-slate-200 dark:border-gray-800 rounded-lg px-2 py-1"><span class="text-sm font-black text-indigo-600 dark:text-indigo-400 animate-pulse">${String(time.seconds).padStart(2,'0')}</span><span class="text-[8px] text-slate-400 block font-bold uppercase">Giây</span></div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    banner.innerHTML = "";
+                }
+            }
+
+            // Update List Item Countdowns
+            if (stats.events && stats.events.length > 0) {
+                stats.events.forEach(ev => {
+                    const cdText = document.getElementById(`ev-cd-${ev.id}`);
+                    if (cdText) {
+                        const time = getTimeRemaining(ev.date);
+                        if (time.expired) {
+                            cdText.textContent = "Đã diễn ra!";
+                            cdText.className = "text-[9px] font-bold text-red-500 bg-red-50 dark:bg-red-950/20 px-2 py-1 rounded";
+                        } else {
+                            cdText.textContent = `${time.days}N ${time.hours}G ${time.minutes}P`;
+                            cdText.className = "text-[9px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 px-2 py-1 rounded timer-font";
+                        }
+                    }
+                });
+            }
+        }
+
+        function renderEvents() {
+            const list = document.getElementById('events-list');
+            if (!list) return;
+            list.innerHTML = "";
+
+            if (!stats.events || stats.events.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center py-6 text-xs text-slate-400 dark:text-gray-500 font-medium border border-dashed border-slate-200 dark:border-gray-855 rounded-xl">
+                        Chưa có sự kiện nào được thiết lập. Hãy tạo đếm ngược ngay!
+                    </div>
+                `;
+                updateAllCountdowns();
+                return;
+            }
+
+            // Sort so pinned is first, then by earliest date ascending
+            const sortedEvents = [...stats.events].sort((a,b) => {
+                if (a.pinned) return -1;
+                if (b.pinned) return 1;
+                return Date.parse(a.date) - Date.parse(b.date);
+            });
+
+            sortedEvents.forEach(ev => {
+                const datePretty = new Date(ev.date).toLocaleString('vi-VN', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const item = document.createElement('div');
+                item.className = `flex justify-between items-center p-3 rounded-xl border transition-all ${ev.pinned ? 'border-indigo-400 bg-indigo-50/10 dark:bg-indigo-950/20' : 'border-slate-150 dark:border-gray-900 bg-slate-50/50 dark:bg-gray-950/30'}`;
+                item.innerHTML = `
+                    <div class="flex flex-col gap-1 max-w-[65%]">
+                        <span class="text-xs font-bold text-slate-800 dark:text-gray-100 flex items-center gap-1.5 truncate">
+                            ${ev.pinned ? '<i data-lucide="pin" class="w-3.5 h-3.5 text-indigo-500 fill-indigo-500 shrink-0"></i>' : ''}
+                            ${ev.name}
+                        </span>
+                        <span class="text-[9px] text-slate-400 dark:text-gray-500 font-semibold uppercase flex items-center gap-1">
+                            <i data-lucide="calendar" class="w-3 h-3"></i> Mốc: ${datePretty}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span id="ev-cd-${ev.id}">--</span>
+                        <div class="flex items-center gap-1">
+                            ${!ev.pinned ? `
+                                <button onclick="pinEvent('${ev.id}')" class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 transition-all" title="Ghim hiển thị trang chủ">
+                                    <i data-lucide="pin" class="w-3.5 h-3.5"></i>
+                                </button>
+                            ` : ''}
+                            <button onclick="deleteEvent('${ev.id}')" class="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all" title="Xóa sự kiện">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+            lucide.createIcons();
+            updateAllCountdowns();
         }
 
         function openSettingsModal() {
@@ -1726,6 +2093,7 @@
                 levelCheckAndCalculation();
                 generateActivityHeatmap();
                 updateMotivationUI();
+                renderEvents();
 
                 document.getElementById('header-sync-status').innerHTML = `<span class="w-1 h-1 rounded-full bg-emerald-500"></span> Đã Đồng Bộ`;
                 document.getElementById('header-sync-status').className = "text-[8px] text-emerald-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5";
@@ -1744,6 +2112,7 @@
 
             if(!stats.modeDistribution) stats.modeDistribution = { pomodoro: 0, english60: 0, math120: 0, continuous: 0 };
             if(!stats.hourlyActivity || stats.hourlyActivity.length !== 24) stats.hourlyActivity = Array(24).fill(0);
+            if(!stats.events) stats.events = [];
         }
 
         function openGuideModal() { document.getElementById('guide-modal').classList.remove('hidden'); }
@@ -1895,6 +2264,7 @@
                 levelCheckAndCalculation();
                 generateActivityHeatmap();
                 updateMotivationUI();
+                renderEvents();
                 
                 showToast("Đã đăng xuất tài khoản.", "emerald");
                 closeAuthModal();
@@ -1909,8 +2279,6 @@
 
         // Authentication Event Observers
         onAuthStateChanged(auth, async (user) => {
-            // Sửa lỗi cực kỳ ngốc nghếch: nếu user đăng xuất (user == null), 
-            // KHÔNG ĐƯỢC CHẶN đứng bằng dòng 'if (!user) return' nữa mà phải reset giao diện!
             const userProfileBadge = document.getElementById('user-profile-badge');
             const headerUserName = document.getElementById('header-user-name');
             const headerSyncStatus = document.getElementById('header-sync-status');
@@ -1920,7 +2288,6 @@
             const authLoggedOutView = document.getElementById('auth-logged-out-view');
 
             if (!user) {
-                // Trạng thái đã đăng xuất / Khách vô danh chưa khởi tạo xong
                 headerUserName.textContent = "Chưa Đăng Nhập";
                 headerSyncStatus.innerHTML = `<span class="w-1 h-1 rounded-full bg-amber-500"></span> Offline`;
                 headerSyncStatus.className = "text-[8px] text-amber-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5";
@@ -1941,13 +2308,11 @@
             }
 
             if (user.isAnonymous) {
-                // Đang là phiên khách
                 headerSyncStatus.innerHTML = `<span class="w-1 h-1 rounded-full bg-amber-500"></span> Chế độ Khách`;
                 headerSyncStatus.className = "text-[8px] text-amber-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5";
                 authLoggedInView.classList.add('hidden');
                 authLoggedOutView.classList.remove('hidden');
             } else {
-                // Đã đăng nhập tài khoản thực sự (Google / Email)
                 headerSyncStatus.innerHTML = `<span class="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span> Đang đồng bộ...`;
                 headerSyncStatus.className = "text-[8px] text-emerald-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5";
                 
@@ -1962,7 +2327,6 @@
                 document.getElementById('profile-auth-provider').textContent = "Liên Kết Đám Mây";
             }
 
-            // Kéo dữ liệu từ đám mây của chính tài khoản này xuống máy khách và cập nhật giao diện
             await fetchCloudDataAndMerge(user);
             lucide.createIcons();
         });
@@ -2010,6 +2374,15 @@
         window.handleGoogleLogin = handleGoogleLogin;
         window.handleGuestLogin = handleGuestLogin;
         window.handleLogout = handleLogout;
+        
+        // Expose new modular functions globally
+        window.openEditTaskModal = openEditTaskModal;
+        window.closeEditTaskModal = closeEditTaskModal;
+        window.saveTaskEdit = saveTaskEdit;
+        window.toggleAddEventForm = toggleAddEventForm;
+        window.addEvent = addEvent;
+        window.deleteEvent = deleteEvent;
+        window.pinEvent = pinEvent;
 
         // Chạy khởi tạo Auth ngay lập tức
         initAuth();
@@ -2028,6 +2401,7 @@
             levelCheckAndCalculation();
             generateActivityHeatmap(); 
             updateMotivationUI(); 
+            renderEvents();
             
             lucide.createIcons();
             
