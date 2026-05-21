@@ -120,7 +120,7 @@
 
     <!-- Top Navigation / Header -->
     <header class="border-b border-slate-200 dark:border-gray-900 bg-white/70 dark:bg-gray-950/70 backdrop-blur-md py-4 px-6 sticky top-0 z-40 transition-colors duration-500">
-        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row gap-4 justify-between items-center">
             <!-- Logo Section -->
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl border border-emerald-500/30 bg-emerald-100 dark:bg-emerald-950/20 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.1)]">
@@ -129,39 +129,53 @@
                 <div>
                     <h1 class="text-base font-bold tracking-tight text-slate-900 dark:text-gray-100 flex items-center gap-2">
                         FocusFlow 
-                        <span class="text-[9px] bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Pro Edition</span>
+                        <span class="text-[9px] bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Pro Cloud</span>
                     </h1>
                     <p class="text-[10px] text-slate-500 dark:text-gray-400 uppercase tracking-widest font-semibold">Kỷ luật tự thân & Số hóa</p>
                 </div>
             </div>
 
-            <!-- Real-time Clock, Streak & Levels -->
-            <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-5">
+            <!-- Profile, Cloud Sync, Themes & Levels -->
+            <div class="flex flex-wrap items-center justify-center gap-3 md:gap-4">
+                
+                <!-- NEW: Account Profile Sync Status -->
+                <div id="user-profile-badge" class="flex items-center gap-2 bg-slate-100 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 px-3 py-1.5 rounded-xl cursor-pointer hover:bg-slate-200 dark:hover:bg-gray-800 transition" onclick="openAuthModal()">
+                    <div id="user-avatar-container" class="w-6 h-6 rounded-full bg-slate-300 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                        <i data-lucide="user" class="w-3.5 h-3.5 text-slate-600 dark:text-gray-300"></i>
+                    </div>
+                    <div class="text-left hidden sm:block">
+                        <div id="header-user-name" class="text-[10px] font-bold text-slate-800 dark:text-gray-200 leading-none">Chưa Đăng Nhập</div>
+                        <div id="header-sync-status" class="text-[8px] text-amber-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5">
+                            <span class="w-1 h-1 rounded-full bg-amber-500"></span> Offline
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Theme Toggle -->
                 <button onclick="toggleTheme()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-gray-900/50 dark:hover:bg-gray-800 border border-slate-200 dark:border-gray-800 text-slate-500 dark:text-sky-300 transition-colors" title="Đổi giao diện">
                     <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
                 </button>
 
-                <!-- NEW: Settings Cog Icon (Bánh răng cài đặt) -->
+                <!-- Settings Cog Icon (Bánh răng cài đặt) -->
                 <button onclick="openSettingsModal()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-gray-900/50 dark:hover:bg-gray-800 border border-slate-200 dark:border-gray-800 text-slate-500 dark:text-gray-400 dark:hover:text-gray-200 transition-colors" title="Cấu hình hệ thống & Âm lượng">
                     <i data-lucide="settings" class="w-4 h-4"></i>
                 </button>
 
                 <!-- Vietnam Real-time Clock -->
-                <div class="hidden sm:flex items-center gap-2 bg-slate-100 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 px-3 py-1.5 rounded-xl">
+                <div class="hidden lg:flex items-center gap-2 bg-slate-100 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 px-3 py-1.5 rounded-xl">
                     <i data-lucide="clock" class="w-4 h-4 text-sky-600 dark:text-sky-400 animate-spin" style="animation-duration: 8s;"></i>
                     <span id="vietnam-clock" class="timer-font text-xs font-bold text-sky-700 dark:text-sky-300 tracking-wide">00:00:00</span>
                 </div>
 
                 <!-- Streak Counter -->
-                <div class="flex items-center gap-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 px-3.5 py-1.5 rounded-xl text-amber-600 dark:text-amber-400">
+                <div class="flex items-center gap-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 px-3 py-1.5 rounded-xl text-amber-600 dark:text-amber-400">
                     <i data-lucide="flame" class="w-4 h-4 fill-amber-500 text-amber-500 animate-bounce"></i>
                     <span id="streak-count" class="text-xs font-extrabold">0</span>
                     <span class="text-[9px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-500">Ngày</span>
                 </div>
 
                 <!-- Level Rank Badge -->
-                <div class="flex items-center gap-3 bg-slate-100 dark:bg-gray-900/40 border border-slate-200 dark:border-gray-800 rounded-xl px-3.5 py-1.5">
+                <div class="flex items-center gap-3 bg-slate-100 dark:bg-gray-900/40 border border-slate-200 dark:border-gray-800 rounded-xl px-3 py-1.5">
                     <div class="text-right">
                         <div class="text-[8px] text-slate-500 dark:text-gray-400 uppercase font-bold tracking-wider">Cấp độ</div>
                         <div id="user-rank" class="text-xs font-bold text-emerald-600 dark:text-emerald-400">Tập Sự</div>
@@ -187,7 +201,7 @@
             <!-- Giant Timer Display Card -->
             <div id="timer-card" class="bg-white dark:bg-darkcard border border-slate-200 dark:border-gray-900 rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center relative shadow-xl dark:shadow-2xl backdrop-blur-md transition-all duration-500 glow-emerald">
                 
-                <!-- Info Button ("i") inside the top corner of the card - FIXED POS -->
+                <!-- Info Button ("i") inside the top corner of the card -->
                 <button onclick="openGuideModal()" class="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-xl border border-slate-200 dark:border-gray-800/80 bg-slate-50 dark:bg-gray-950/60 text-slate-400 dark:text-gray-400 hover:text-emerald-500 hover:border-emerald-500/30 transition duration-200 z-30" title="Hướng dẫn sử dụng hiệu quả">
                     <i data-lucide="info" class="w-4.5 h-4.5"></i>
                 </button>
@@ -230,7 +244,7 @@
                         </div>
                         <div class="bg-slate-100 dark:bg-gray-950/95 p-3 rounded-xl border border-slate-200 dark:border-gray-900 w-full space-y-3">
                             <div class="flex items-center justify-between gap-1.5">
-                                <button onclick="setMode('continuous')" id="btn-continuous-mode" class="flex-grow py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold text-slate-600 dark:text-gray-400 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 hover:bg-slate-50 flex items-center justify-center gap-1.5">
+                                <button onclick="setMode('continuous')" id="btn-continuous-mode" class="flex-grow py-2 text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold text-slate-600 dark:text-gray-400 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-880 hover:bg-slate-50 flex items-center justify-center gap-1.5">
                                     <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Chuyển sang Học tự do
                                 </button>
                             </div>
@@ -327,19 +341,18 @@
                         Lịch Sử Luyện Tập (Anki Heatmap)
                     </h3>
                     
-                    <!-- NEW: Deep Stats Modal Trigger -->
                     <div class="flex items-center gap-3">
                         <button onclick="openStatsModal()" class="text-[10px] bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/50 px-2.5 py-1 rounded-md font-bold uppercase tracking-wider hover:bg-indigo-100 dark:hover:bg-indigo-900 transition flex items-center gap-1.5">
                             <i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Phân tích
                         </button>
                         <div class="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-gray-400 font-bold hidden sm:flex">
                             <span>Ít</span>
-                            <span class="w-3 h-3 rounded bg-slate-100 dark:bg-gray-900 border border-slate-200 dark:border-gray-800/30"></span>
+                            <span class="w-3 h-3 rounded bg-slate-100 dark:bg-gray-900 border border-slate-200 dark:border-gray-805"></span>
                             <span class="w-3 h-3 rounded bg-emerald-100/40 dark:bg-emerald-950/30 border border-emerald-200/40 dark:border-emerald-900/20"></span>
                             <span class="w-3 h-3 rounded bg-emerald-300/60 dark:bg-emerald-800/50 border border-emerald-400/50 dark:border-emerald-700/30"></span>
                             <span class="w-3 h-3 rounded bg-emerald-500/80 dark:bg-emerald-600/70 border border-emerald-500/70 dark:border-emerald-500/40"></span>
                             <span class="w-3 h-3 rounded bg-emerald-600 dark:bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.6)]"></span>
-                            <span>Nhiều (Tịnh Tiến)</span>
+                            <span>Nhiều</span>
                         </div>
                     </div>
                 </div>
@@ -353,7 +366,7 @@
 
                 <div class="mt-2.5 text-[10px] text-slate-500 dark:text-gray-400 font-medium flex flex-col sm:flex-row justify-between gap-1">
                     <span>Thành quả tích lũy trong 12 tuần qua</span>
-                    <span class="text-emerald-600 dark:text-emerald-400 font-bold">Màu sắc đậm dần tịnh tiến theo kỷ lục cá nhân!</span>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold">Đồng bộ trực tiếp trên tài khoản bảo mật của bạn</span>
                 </div>
 
                 <!-- Basic Stats Panel below Heatmap -->
@@ -421,10 +434,113 @@
         </section>
     </main>
 
-    <!-- NEW: SYSTEM SETTINGS MODAL (Giao diện cài đặt răng cưa) -->
+    <!-- NEW: FIREBASE AUTHENTICATION MODAL (Giao diện đăng ký/đăng nhập Google, Email) -->
+    <div id="auth-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 dark:bg-gray-950/90 backdrop-blur-md hidden transition-all duration-300">
+        <div class="bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative overflow-hidden flex flex-col">
+            <!-- Decorative light effects -->
+            <div class="absolute -right-20 -bottom-20 w-44 h-44 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-20 -top-20 w-44 h-44 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="flex justify-between items-center mb-6 border-b border-slate-150 dark:border-gray-900 pb-3 relative z-10">
+                <div class="flex items-center gap-2.5">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i>
+                    <h3 id="auth-modal-title" class="text-xs font-bold text-slate-800 dark:text-gray-100 uppercase tracking-widest">Đồng bộ Đám mây</h3>
+                </div>
+                <button onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-600 dark:text-gray-500 dark:hover:text-gray-300 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Profile Summary (Shown when logged in) -->
+            <div id="auth-logged-in-view" class="hidden space-y-6 text-center relative z-10 py-4">
+                <div class="flex flex-col items-center gap-3">
+                    <div id="profile-large-avatar" class="w-20 h-20 rounded-full bg-emerald-100 dark:bg-emerald-950/30 border-2 border-emerald-500 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-black text-2xl uppercase shadow-lg">
+                        G
+                    </div>
+                    <div>
+                        <h4 id="profile-display-name" class="font-bold text-slate-900 dark:text-gray-50 text-base">Học Viên FocusFlow</h4>
+                        <p id="profile-display-email" class="text-xs text-slate-500 dark:text-gray-400 mt-1">user@focusflow.com</p>
+                    </div>
+                    <span id="profile-auth-provider" class="text-[9px] bg-indigo-100 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/30 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Đăng nhập ẩn danh</span>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-850 p-4 rounded-2xl text-left space-y-2">
+                    <span class="text-[9px] text-slate-400 dark:text-gray-500 uppercase font-black tracking-widest block">Trạng thái đám mây</span>
+                    <div class="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+                        <i data-lucide="cloud-lightning" class="w-4 h-4 animate-bounce"></i>
+                        <span>Đã kết nối và đồng bộ hóa thời gian thực</span>
+                    </div>
+                    <p class="text-[10px] text-slate-500 dark:text-gray-400 leading-relaxed">Tất cả dữ liệu luyện tập, XP và danh sách nhiệm vụ của bạn hiện tại đã được đồng bộ hóa hoàn hảo lên hệ thống máy chủ đám mây.</p>
+                </div>
+
+                <button onclick="handleLogout()" class="w-full py-3 rounded-2xl bg-red-50 hover:bg-red-100 dark:bg-red-950/20 text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-900/30 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition active:scale-[0.98]">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Đăng xuất tài khoản
+                </button>
+            </div>
+
+            <!-- Login / Register Views (Shown when logged out) -->
+            <div id="auth-logged-out-view" class="space-y-6 relative z-10">
+                <!-- Tab Switching buttons -->
+                <div class="grid grid-cols-2 bg-slate-100 dark:bg-gray-950 border border-slate-200 dark:border-gray-900 p-1 rounded-xl">
+                    <button id="auth-tab-login" onclick="switchAuthView('login')" class="py-2 text-[10px] sm:text-xs rounded-lg font-bold transition bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 shadow-sm">Đăng Nhập</button>
+                    <button id="auth-tab-signup" onclick="switchAuthView('signup')" class="py-2 text-[10px] sm:text-xs rounded-lg font-bold transition text-slate-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-gray-200">Đăng Ký</button>
+                </div>
+
+                <!-- Google Quick OAuth Login -->
+                <button onclick="handleGoogleLogin()" class="w-full py-3 px-4 bg-slate-50 hover:bg-slate-100 dark:bg-gray-900 dark:hover:bg-gray-850 border border-slate-200 dark:border-gray-800 text-slate-700 dark:text-gray-300 text-xs font-bold rounded-2xl flex items-center justify-center gap-3 transition active:scale-[0.98]">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                        <g transform="matrix(1, 0, 0, 1, 0, 0)">
+                            <path d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.57h3.3c1.93,-1.78 3.04,-4.4 3.04,-7.47C21.68,11.77 21.56,11.41 21.35,11.1z" fill="#4285F4" />
+                            <path d="M12,20.57c2.59,0 4.77,-0.86 6.36,-2.33l-3.3,-2.57c-0.91,0.61 -2.08,0.98 -3.06,0.98 -2.36,0 -4.36,-1.59 -5.08,-3.73H3.5v2.65C5.08,18.73 8.35,20.57 12,20.57z" fill="#34A853" />
+                            <path d="M6.92,12.92c-0.18,-0.54 -0.28,-1.12 -0.28,-1.72s0.1,-1.18 0.28,-1.72V6.83H3.5C2.9,8.02 2.56,9.38 2.56,10.8s0.34,2.78 0.94,3.97l3.42,-2.65z" fill="#FBBC05" />
+                            <path d="M12,5.08c1.41,0 2.68,0.49 3.68,1.44l2.76,-2.76C16.77,2.15 14.59,1.23 12,1.23 8.35,1.23 5.08,3.07 3.5,6.83l3.42,2.65C7.64,6.67 9.64,5.08 12,5.08z" fill="#EA4335" />
+                        </g>
+                    </svg>
+                    Tiếp tục với Google
+                </button>
+
+                <div class="relative flex py-1 items-center">
+                    <div class="flex-grow border-t border-slate-200 dark:border-gray-900"></div>
+                    <span class="flex-shrink mx-4 text-[9px] uppercase tracking-widest text-slate-400 dark:text-gray-500 font-bold">Hoặc dùng Email</span>
+                    <div class="flex-grow border-t border-slate-200 dark:border-gray-900"></div>
+                </div>
+
+                <!-- Auth Input Form -->
+                <form onsubmit="handleEmailAuth(event)" class="space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-[9px] uppercase tracking-widest text-slate-500 dark:text-gray-400 font-bold px-1">Địa chỉ Email</label>
+                        <input id="auth-email" type="email" placeholder="example@focusflow.com" required class="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-xl px-4 py-3 text-xs text-slate-800 dark:text-gray-100 focus:outline-none focus:border-emerald-500/50 font-medium">
+                    </div>
+                    
+                    <div class="space-y-1">
+                        <label class="text-[9px] uppercase tracking-widest text-slate-500 dark:text-gray-400 font-bold px-1">Mật khẩu</label>
+                        <input id="auth-password" type="password" placeholder="••••••••" required class="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-xl px-4 py-3 text-xs text-slate-800 dark:text-gray-100 focus:outline-none focus:border-emerald-500/50 font-medium">
+                    </div>
+
+                    <!-- Confirm Password (Only visible in Register mode) -->
+                    <div id="auth-confirm-password-container" class="space-y-1 hidden">
+                        <label class="text-[9px] uppercase tracking-widest text-slate-500 dark:text-gray-400 font-bold px-1">Xác nhận mật khẩu</label>
+                        <input id="auth-confirm-password" type="password" placeholder="••••••••" class="w-full bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-xl px-4 py-3 text-xs text-slate-800 dark:text-gray-100 focus:outline-none focus:border-emerald-500/50 font-medium">
+                    </div>
+
+                    <button type="submit" id="auth-submit-btn" class="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white dark:text-gray-950 font-bold text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-emerald-500/10 transition active:scale-[0.98] mt-2">
+                        Đăng Nhập
+                    </button>
+                </form>
+
+                <!-- Guest Login Alternative -->
+                <div class="pt-2 text-center">
+                    <button onclick="handleGuestLogin()" class="text-[10px] text-slate-500 hover:text-emerald-500 dark:text-gray-400 dark:hover:text-emerald-400 font-bold uppercase tracking-wider transition">
+                        Trải nghiệm Khách (Không cần tài khoản)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SYSTEM SETTINGS MODAL -->
     <div id="settings-modal" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/50 dark:bg-gray-950/80 backdrop-blur-md hidden transition-opacity duration-300">
         <div class="bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-2xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden flex flex-col">
-            <!-- Background Decoration -->
             <div class="absolute -right-12 -bottom-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-2xl"></div>
 
             <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-200 dark:border-gray-900">
@@ -439,7 +555,6 @@
 
             <!-- Settings Content -->
             <div class="space-y-6 text-xs">
-                
                 <!-- 1. Volume Config Control -->
                 <div class="bg-slate-50 dark:bg-gray-900/40 border border-slate-100 dark:border-gray-800/60 rounded-xl p-4 space-y-3">
                     <div class="flex justify-between items-center">
@@ -501,7 +616,6 @@
                         Xóa toàn bộ dữ liệu ứng dụng
                     </button>
                 </div>
-
             </div>
 
             <div class="mt-6 pt-4 border-t border-slate-200 dark:border-gray-900 flex gap-3">
@@ -511,10 +625,9 @@
         </div>
     </div>
 
-    <!-- NEW: Advanced Stats Modal (Anki Style) -->
+    <!-- Advanced Stats Modal (Anki Style) -->
     <div id="stats-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 dark:bg-gray-950/80 backdrop-blur-md hidden transition-opacity duration-300">
         <div class="bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
-            <!-- Decorative blur -->
             <div class="absolute -left-20 -top-20 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
             
             <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-200 dark:border-gray-900">
@@ -528,7 +641,6 @@
             </div>
 
             <div class="overflow-y-auto pr-2 space-y-8 flex-grow">
-                
                 <!-- 1. Bar Chart: Last 7 Days -->
                 <div>
                     <h4 class="text-xs font-bold text-slate-600 dark:text-gray-300 mb-4 flex justify-between items-end">
@@ -536,32 +648,28 @@
                         <span class="text-[10px] text-slate-400 dark:text-gray-500 font-normal">Đơn vị: Phút</span>
                     </h4>
                     <div class="h-40 w-full bg-slate-50 dark:bg-gray-900/50 rounded-xl border border-slate-100 dark:border-gray-800/50 p-4 flex items-end justify-between gap-2 relative">
-                        <!-- Horizontal Grid Lines -->
                         <div class="absolute inset-0 flex flex-col justify-between pointer-events-none px-4 py-4">
                             <div class="border-b border-slate-200 dark:border-gray-800/40 w-full h-px border-dashed"></div>
                             <div class="border-b border-slate-200 dark:border-gray-800/40 w-full h-px border-dashed"></div>
                             <div class="border-b border-slate-200 dark:border-gray-800/40 w-full h-px border-dashed"></div>
                         </div>
-                        <!-- Bars injected by JS -->
                         <div id="bar-chart-container" class="w-full h-full flex items-end justify-between gap-1 sm:gap-4 relative z-10">
                         </div>
                     </div>
                 </div>
 
-                <!-- NEW FEATURE: Hourly Focus Distribution (0 - 23h) -->
+                <!-- Hourly Focus Distribution (0 - 23h) -->
                 <div>
                     <h4 class="text-xs font-bold text-slate-600 dark:text-gray-300 mb-3 flex justify-between items-end">
                         <span>Chia nhỏ theo giờ học tập (0h - 23h)</span>
                         <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Khung giờ năng suất nhất của bạn</span>
                     </h4>
                     <div class="h-36 w-full bg-slate-50 dark:bg-gray-900/50 rounded-xl border border-slate-100 dark:border-gray-800/50 p-3 flex items-end justify-between relative">
-                        <!-- Horizontal Grid Lines -->
                         <div class="absolute inset-0 flex flex-col justify-between pointer-events-none px-4 py-3">
                             <div class="border-b border-slate-200 dark:border-gray-800/40 w-full h-px border-dashed"></div>
                             <div class="border-b border-slate-200 dark:border-gray-800/40 w-full h-px border-dashed"></div>
                             <div class="border-b border-slate-200 dark:border-gray-800/40 w-full h-px border-dashed"></div>
                         </div>
-                        <!-- 24 Bars injected by JS -->
                         <div id="hourly-chart-container" class="w-full h-full flex items-end justify-between gap-[2px] sm:gap-[4px] relative z-10">
                         </div>
                     </div>
@@ -579,10 +687,8 @@
                     <div class="bg-slate-50 dark:bg-gray-900/30 rounded-xl p-4 border border-slate-100 dark:border-gray-800/50">
                         <h4 class="text-xs font-bold text-slate-600 dark:text-gray-300 mb-4">Phân bổ thời gian</h4>
                         <div class="flex items-center gap-6">
-                            <!-- CSS Conic Gradient Pie Chart -->
                             <div id="mode-pie-chart" class="w-24 h-24 rounded-full flex-shrink-0 shadow-lg border-2 border-white dark:border-gray-800" style="background: conic-gradient(#10b981 0% 25%, #f59e0b 25% 50%, #ea580c 50% 75%, #3b82f6 75% 100%);"></div>
                             
-                            <!-- Legend -->
                             <div class="flex flex-col gap-2 text-[10px] font-medium w-full">
                                 <div class="flex justify-between items-center"><span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-emerald-500"></span>Pomodoro</span> <span id="leg-pomo" class="font-mono text-slate-600 dark:text-gray-300">0%</span></div>
                                 <div class="flex justify-between items-center"><span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-amber-500"></span>T.Anh</span> <span id="leg-eng" class="font-mono text-slate-600 dark:text-gray-300">0%</span></div>
@@ -618,7 +724,7 @@
         </div>
     </div>
 
-    <!-- Custom Guide Modal ("i") -->
+    <!-- Custom Guide Modal -->
     <div id="guide-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 dark:bg-gray-950/80 backdrop-blur-sm hidden transition-opacity duration-300">
         <div class="bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-900 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative overflow-hidden">
             <div class="absolute -right-16 -top-16 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
@@ -635,16 +741,16 @@
 
             <div class="space-y-4 text-xs text-slate-600 dark:text-gray-300 overflow-y-auto max-h-96 pr-1">
                 <div>
-                    <span class="text-emerald-600 dark:text-emerald-400 font-bold block mb-1">1. Quản lý Nhiệm vụ & Đồng bộ giờ học</span>
-                    <p class="leading-relaxed">Khi tạo một nhiệm vụ mới, hãy bấm biểu tượng <strong class="text-emerald-600 dark:text-emerald-400">"Mục tiêu"</strong> để gắn nó vào bộ đếm giờ chính. Thời gian học tích lũy sẽ được tính trực tiếp cho riêng nhiệm vụ đó.</p>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold block mb-1">1. Đăng nhập & Đồng bộ đám mây</span>
+                    <p class="leading-relaxed">Nhấp vào thẻ <strong class="text-emerald-600 dark:text-emerald-400">Tài khoản</strong> ở góc phải phía trên để đăng nhập Google hoặc Email. Hệ thống sẽ tự động đồng bộ hóa tất cả tiến trình học, điểm XP và lịch sử của bạn.</p>
                 </div>
                 <div>
-                    <span class="text-emerald-600 dark:text-emerald-400 font-bold block mb-1">2. Thống kê chi tiết (Anki Mode)</span>
-                    <p class="leading-relaxed">Sử dụng nút <strong>"Phân tích chuyên sâu"</strong> để xem bảng theo dõi quá trình học tập với các biểu đồ trực quan, giúp bạn có cái nhìn rõ nhất về nỗ lực của bản thân.</p>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold block mb-1">2. Quản lý tác vụ liên thông</span>
+                    <p class="leading-relaxed">Khi tạo một nhiệm vụ mới, hãy bấm biểu tượng <strong class="text-emerald-600 dark:text-emerald-400">"Mục tiêu"</strong> để kết nối trực tiếp với đồng hồ đếm. Thời gian học tích lũy sẽ cộng dồn chuẩn xác vào mục tiêu đó.</p>
                 </div>
                 <div>
-                    <span class="text-emerald-600 dark:text-emerald-400 font-bold block mb-1">3. Thử thách Phòng thi</span>
-                    <p class="leading-relaxed">Bật tính năng <strong class="text-amber-500">Tích tắc</strong> để tăng cường áp lực phòng thi khi làm đề Toán, Văn hay Tiếng Anh.</p>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold block mb-1">3. Giả lập tích hợp</span>
+                    <p class="leading-relaxed">Chế độ giả lập phòng thi tăng cường áp lực làm bài với nhịp gõ tích tắc, đem lại khả năng tập trung toàn phần lý tưởng.</p>
                 </div>
             </div>
 
@@ -664,14 +770,14 @@
             <p class="text-xs text-slate-500 dark:text-gray-400 mb-6 leading-relaxed">Bạn có thực sự muốn bắt đầu lại? Toàn bộ thống kê, cấp độ và lịch sử Heatmap sẽ mất vĩnh viễn.</p>
             
             <div class="flex gap-3">
-                <button onclick="closeResetModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-gray-900 hover:bg-slate-200 dark:hover:bg-gray-800 text-slate-600 dark:text-gray-300 font-bold text-xs uppercase tracking-wider border border-slate-200 dark:border-gray-800">Hủy</button>
+                <button onclick="closeResetModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-gray-900 hover:bg-slate-200 dark:hover:bg-gray-800 text-slate-600 dark:text-gray-300 font-bold text-xs uppercase tracking-wider border border-slate-200 dark:border-gray-850">Hủy</button>
                 <button onclick="executeResetAllData()" class="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg">Xóa Toàn Bộ</button>
             </div>
         </div>
     </div>
 
     <!-- Custom Toast Notification System -->
-    <div id="toast-notif" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-850 text-slate-800 dark:text-gray-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 z-[90] text-xs max-w-xs">
+    <div id="toast-notif" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-850 text-slate-800 dark:text-gray-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 z-[110] text-xs max-w-xs">
         <div id="toast-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
         <span id="toast-text" class="font-bold tracking-wide">Trạng thái rèn luyện</span>
     </div>
@@ -681,14 +787,52 @@
         <p>© 2026 FocusFlow Premium • Kỷ luật tối giản & Trí tuệ hóa</p>
     </footer>
 
-    <!-- JavaScript Execution Layer -->
-    <script>
-        // --- THEME MANAGEMENT ---
+    <!-- JavaScript MODULE Execution Layer with FIREBASE integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            signInWithPopup, 
+            GoogleAuthProvider, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            getDoc 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- FIREBASE CONFIGURATION (Provided by User) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDON9TZ-fsMsLKLGkqhqk6EXKCF5VaPEc4",
+            authDomain: "focusflowstudy.firebaseapp.com",
+            projectId: "focusflowstudy",
+            storageBucket: "focusflowstudy.firebasestorage.app",
+            messagingSenderId: "223249001449",
+            appId: "1:223249001449:web:409be9ae90e7f8f28eb978",
+            measurementId: "G-6EVY6Z6C4F"
+        };
+
+        // Initialize Firebase Apps
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Dynamic App ID resolution based on context
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'focusflowstudy';
+
+        let activeAuthView = 'login'; // 'login' or 'signup'
+
+        // Theme management
         function toggleTheme() {
             const isDark = document.documentElement.classList.toggle('dark');
             localStorage.setItem('focusflow_theme', isDark ? 'dark' : 'light');
             updateThemeIcon();
-            // Re-render heatmap to recalculate continuous HSL colors suited for the new theme
             generateActivityHeatmap();
         }
         function updateThemeIcon() {
@@ -710,7 +854,7 @@
             continuous: 45
         };
 
-        // NEW: Volume Setting parameter (Giá trị mặc định là 100%)
+        // Volume configuration
         let appVolume = 100;
 
         // Core App States
@@ -722,7 +866,6 @@
             totalDurationSeconds: CONFIG.pomodoro * 60
         };
 
-        // --- BACKGROUND WEB WORKER SYSTEM ---
         const workerScript = `
             let timer = null;
             self.onmessage = function(e) {
@@ -743,7 +886,6 @@
         const blob = new Blob([workerScript], { type: 'application/javascript' });
         const worker = new Worker(URL.createObjectURL(blob));
 
-        // Lắng nghe tín hiệu đếm giây (tick) cực kỳ chính xác từ Worker chạy nền độc lập
         worker.onmessage = function(e) {
             if (e.data === 'tick' && timerState.isRunning) {
                 tick();
@@ -760,11 +902,10 @@
             lastCompletedDateString: '', 
             dailyActivity: {}, 
             modeDistribution: { pomodoro: 0, english60: 0, math120: 0, continuous: 0 },
-            hourlyActivity: Array(24).fill(0), // Focus minutes per hour (0 - 23)
+            hourlyActivity: Array(24).fill(0),
             activeTaskId: null
         };
 
-        // Inspirational Data
         const motivationalQuotes = [
             "Kỷ luật là cầu nối giữa mục tiêu và thành tựu.",
             "Mồ hôi trên trang sách hôm nay là nụ cười ngày mai.",
@@ -776,7 +917,6 @@
             "Kẻ thù lớn nhất của sự vĩ đại chính là sự bằng lòng."
         ];
 
-        // DOM elements
         const timerDisplay = document.getElementById('timer-display');
         const timerLabel = document.getElementById('timer-label');
         const progressCircle = document.getElementById('progress-circle');
@@ -804,7 +944,7 @@
         const streakCount = document.getElementById('streak-count');
         const timerCard = document.getElementById('timer-card');
 
-        // Realtime Clock
+        // Realtime Clock setup
         function updateVietnamClock() {
             const clockEl = document.getElementById('vietnam-clock');
             if(!clockEl) return;
@@ -817,7 +957,6 @@
         setInterval(updateVietnamClock, 1000);
         updateVietnamClock();
 
-        // Custom Floating Tooltip Logic for Heatmap
         const tooltip = document.getElementById('heatmap-tooltip');
         const tooltipDate = document.getElementById('tooltip-date');
         const tooltipValue = document.getElementById('tooltip-value');
@@ -851,7 +990,6 @@
             return date.toLocaleDateString('vi-VN', { weekday: 'short', month: 'short', day: 'numeric' });
         }
 
-        // CANVAS CONFETTI
         const canvas = document.getElementById('confetti-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -912,32 +1050,27 @@
         }
         animateConfetti();
 
-        // --- UPGRADED SOUND SYSTEM WITH DYNAMIC VOLUME ---
-        // Hàm tính toán hệ số Gain dựa trên thanh trượt âm lượng người dùng chọn
         function getVolumeMultiplier() {
-            // appVolume có giá trị từ 0 đến 200 (100% tương đương hệ số gốc)
             return appVolume / 100;
         }
 
         function playChime() {
             try {
                 const volMultiplier = getVolumeMultiplier();
-                if (volMultiplier <= 0) return; // Muted
+                if (volMultiplier <= 0) return;
 
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 
-                // Nốt thứ 1
                 let osc1 = audioCtx.createOscillator(); 
                 let gain1 = audioCtx.createGain();
                 osc1.connect(gain1); gain1.connect(audioCtx.destination);
                 osc1.type = 'sine'; osc1.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
                 gain1.gain.setValueAtTime(0, audioCtx.currentTime); 
-                gain1.gain.linearRampToValueAtTime(0.35 * volMultiplier, audioCtx.currentTime + 0.05); // Tăng biên độ gốc lên 0.35
+                gain1.gain.linearRampToValueAtTime(0.35 * volMultiplier, audioCtx.currentTime + 0.05);
                 gain1.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.8);
                 osc1.start(); osc1.stop(audioCtx.currentTime + 0.8);
 
                 setTimeout(() => {
-                    // Nốt thứ 2
                     let osc2 = audioCtx.createOscillator(); 
                     let gain2 = audioCtx.createGain();
                     osc2.connect(gain2); gain2.connect(audioCtx.destination);
@@ -949,7 +1082,6 @@
                 }, 100);
 
                 setTimeout(() => {
-                    // Nốt thứ 3
                     let osc3 = audioCtx.createOscillator(); 
                     let gain3 = audioCtx.createGain();
                     osc3.connect(gain3); gain3.connect(audioCtx.destination);
@@ -965,7 +1097,7 @@
         function playTickSound() {
             try {
                 const volMultiplier = getVolumeMultiplier();
-                if (volMultiplier <= 0) return; // Muted
+                if (volMultiplier <= 0) return;
 
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 let osc = audioCtx.createOscillator(); 
@@ -975,13 +1107,12 @@
                 const isEven = timerState.seconds % 2 === 0;
                 osc.frequency.setValueAtTime(isEven ? 900 : 750, audioCtx.currentTime);
                 gain.gain.setValueAtTime(0, audioCtx.currentTime); 
-                gain.gain.linearRampToValueAtTime(0.08 * volMultiplier, audioCtx.currentTime + 0.002); // Tăng biên độ gốc của tích tắc
+                gain.gain.linearRampToValueAtTime(0.08 * volMultiplier, audioCtx.currentTime + 0.002);
                 gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.04);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.05);
             } catch (e) {}
         }
 
-        // --- NEW: TEST SOUND HANDLERS ---
         function testTickSound() {
             playTickSound();
             showToast("Đang phát thử âm thanh gõ nhịp tích tắc!", "emerald");
@@ -992,7 +1123,6 @@
             showToast("Đang phát thử âm thanh chuông báo kết thúc!", "emerald");
         }
 
-        // Date utils
         function getTodayDateString() {
             const today = new Date();
             const yyyy = today.getFullYear();
@@ -1010,7 +1140,6 @@
             return dates;
         }
 
-        // Motivation UI
         function updateMotivationUI() {
             const pomoCountEl = document.getElementById('pomo-count');
             if (pomoCountEl) pomoCountEl.textContent = `Hoàn thành: ${stats.completedSessions}`;
@@ -1031,14 +1160,13 @@
             }
         }
 
-        // IMPROVED: Continuous Progress-based Heatmap (Anki Style Dynamic Lightness)
         function generateActivityHeatmap() {
             const heatmapContainer = document.getElementById('activity-heatmap');
+            if (!heatmapContainer) return;
             heatmapContainer.innerHTML = '';
             const totalDaysToShow = 84; 
             const pastDates = getPastDates(totalDaysToShow);
 
-            // Find historical maximum daily focus minutes to scale dynamically (prevent 0 division)
             const activeMinutesValues = Object.values(stats.dailyActivity).filter(m => m > 0);
             const maxMinutesObserved = activeMinutesValues.length > 0 ? Math.max(...activeMinutesValues) : 60;
 
@@ -1058,10 +1186,8 @@
                     const isDarkTheme = document.documentElement.classList.contains('dark');
 
                     if (focusMinutes === 0) {
-                        // Empty Day styling
                         bgClass = 'bg-slate-100 dark:bg-gray-900 border border-slate-200/50 dark:border-gray-800/40';
                     } else {
-                        // Dynamically calculate the continuous ratio (0.01 to 1.0)
                         const ratio = Math.min(focusMinutes / maxMinutesObserved, 1);
                         
                         if (isDarkTheme) {
@@ -1105,7 +1231,6 @@
             document.getElementById('stat-avg-time').textContent = `${avg}p / ngày`;
         }
 
-        // DEEP STATS MODAL RENDERER
         function openStatsModal() {
             document.getElementById('stats-modal').classList.remove('hidden');
             renderDeepStats();
@@ -1115,17 +1240,17 @@
         }
 
         function renderDeepStats() {
-            // 1. Render Bar Chart (Last 7 Days)
             const chartContainer = document.getElementById('bar-chart-container');
+            if (!chartContainer) return;
             chartContainer.innerHTML = '';
             const past7 = getPastDates(7);
             
-            let maxMin = 10; // min scale
+            let maxMin = 10;
             past7.forEach(d => { if(stats.dailyActivity[d] > maxMin) maxMin = stats.dailyActivity[d]; });
 
             past7.forEach(d => {
                 const mins = stats.dailyActivity[d] || 0;
-                const percent = Math.max((mins / maxMin) * 100, 2); // minimum 2% height for visibility
+                const percent = Math.max((mins / maxMin) * 100, 2);
                 const dayLabel = new Date(d).toLocaleDateString('vi-VN', {weekday: 'short'});
                 
                 const barCol = document.createElement('div');
@@ -1138,47 +1263,47 @@
                 chartContainer.appendChild(barCol);
             });
 
-            // 2. Render Hourly Focus Distribution Chart (0h - 23h)
+            // Hourly Distribution
             const hourlyContainer = document.getElementById('hourly-chart-container');
-            hourlyContainer.innerHTML = '';
-            
-            if (!stats.hourlyActivity || stats.hourlyActivity.length !== 24) {
-                stats.hourlyActivity = Array(24).fill(0);
-            }
-
-            let maxHourVal = 5; // Default baseline scale
-            stats.hourlyActivity.forEach(v => { if (v > maxHourVal) maxHourVal = v; });
-
-            for (let h = 0; h < 24; h++) {
-                const focusMinsInHour = stats.hourlyActivity[h] || 0;
-                const percent = Math.max((focusMinsInHour / maxHourVal) * 100, 2);
-
-                const isHighestHour = focusMinsInHour === maxHourVal && maxHourVal > 0;
-                let barColorClass = "bg-indigo-500 hover:bg-indigo-400 dark:bg-indigo-600 dark:hover:bg-indigo-500";
-                
-                if (isHighestHour) {
-                    barColorClass = "bg-emerald-500 dark:bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.5)]";
-                } else if (focusMinsInHour > 0) {
-                    barColorClass = "bg-teal-500 dark:bg-teal-600";
+            if (hourlyContainer) {
+                hourlyContainer.innerHTML = '';
+                if (!stats.hourlyActivity || stats.hourlyActivity.length !== 24) {
+                    stats.hourlyActivity = Array(24).fill(0);
                 }
 
-                const barUnit = document.createElement('div');
-                barUnit.className = "flex flex-col items-center justify-end h-full flex-grow relative group cursor-pointer";
-                barUnit.innerHTML = `
-                    <div class="absolute -top-7 text-[8.5px] font-bold text-slate-500 dark:text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded shadow z-30 whitespace-nowrap">${h}h: ${focusMinsInHour}p</div>
-                    <div class="w-full ${barColorClass} rounded-t-[2px] transition-all duration-500 h-0" style="height: ${percent}%;"></div>
-                    <span class="text-[8px] text-slate-400 dark:text-gray-600 font-bold mt-1 scale-90 sm:scale-100">${h}</span>
-                `;
-                hourlyContainer.appendChild(barUnit);
-                
-                // Smooth animation timing
-                setTimeout(() => {
-                    const el = barUnit.querySelector('.w-full');
-                    if (el) el.style.height = `${percent}%`;
-                }, 50);
+                let maxHourVal = 5;
+                stats.hourlyActivity.forEach(v => { if (v > maxHourVal) maxHourVal = v; });
+
+                for (let h = 0; h < 24; h++) {
+                    const focusMinsInHour = stats.hourlyActivity[h] || 0;
+                    const percent = Math.max((focusMinsInHour / maxHourVal) * 100, 2);
+
+                    const isHighestHour = focusMinsInHour === maxHourVal && maxHourVal > 0;
+                    let barColorClass = "bg-indigo-500 hover:bg-indigo-400 dark:bg-indigo-600 dark:hover:bg-indigo-500";
+                    
+                    if (isHighestHour) {
+                        barColorClass = "bg-emerald-500 dark:bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.5)]";
+                    } else if (focusMinsInHour > 0) {
+                        barColorClass = "bg-teal-500 dark:bg-teal-600";
+                    }
+
+                    const barUnit = document.createElement('div');
+                    barUnit.className = "flex flex-col items-center justify-end h-full flex-grow relative group cursor-pointer";
+                    barUnit.innerHTML = `
+                        <div class="absolute -top-7 text-[8.5px] font-bold text-slate-500 dark:text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded shadow z-30 whitespace-nowrap">${h}h: ${focusMinsInHour}p</div>
+                        <div class="w-full ${barColorClass} rounded-t-[2px] transition-all duration-500 h-0" style="height: ${percent}%;"></div>
+                        <span class="text-[8px] text-slate-400 dark:text-gray-600 font-bold mt-1 scale-90 sm:scale-100">${h}</span>
+                    `;
+                    hourlyContainer.appendChild(barUnit);
+                    
+                    setTimeout(() => {
+                        const el = barUnit.querySelector('.w-full');
+                        if (el) el.style.height = `${percent}%`;
+                    }, 50);
+                }
             }
 
-            // 3. Render Pie Chart (Mode distribution)
+            // Pie Chart rendering
             const md = stats.modeDistribution || { pomodoro: 0, english60: 0, math120: 0, continuous: 0 };
             const totalMd = md.pomodoro + md.english60 + md.math120 + md.continuous;
             
@@ -1190,7 +1315,6 @@
                 pctCont = 100 - pctPomo - pctEng - pctMath;
             }
 
-            // CSS Conic Gradient logic
             const p1 = pctPomo;
             const p2 = p1 + pctEng;
             const p3 = p2 + pctMath;
@@ -1201,23 +1325,22 @@
                 #ea580c ${p2}% ${p3}%, 
                 #3b82f6 ${p3}% 100%
             )`;
-            document.getElementById('mode-pie-chart').style.background = totalMd === 0 ? '#e2e8f0' : gradientStr;
+            const pieEl = document.getElementById('mode-pie-chart');
+            if (pieEl) pieEl.style.background = totalMd === 0 ? '#e2e8f0' : gradientStr;
 
             document.getElementById('leg-pomo').textContent = `${pctPomo}%`;
             document.getElementById('leg-eng').textContent = `${pctEng}%`;
             document.getElementById('leg-math').textContent = `${pctMath}%`;
             document.getElementById('leg-cont').textContent = `${pctCont}%`;
 
-            // 4. Highlight Records
             let bestDay = 0;
             Object.values(stats.dailyActivity).forEach(val => { if(val > bestDay) bestDay = val; });
             document.getElementById('stat-best-day').textContent = `${bestDay} phút`;
             
             const totalTasksDone = tasks.filter(t => t.completed).length;
-            document.getElementById('stat-total-tasks').textContent = `${totalTasksDone} tác vụ`;
+            document.getElementById('stat-total-tasks').textContent = `${totalTasksDone} nhiệm vụ`;
         }
 
-        // Streak
         function evaluateStreakAndCheck() {
             const todayStr = getTodayDateString();
             if (!stats.lastCompletedDateString) { stats.streak = 0; streakCount.textContent = "0"; return; }
@@ -1226,7 +1349,6 @@
             streakCount.textContent = stats.streak;
         }
 
-        // Adjust continuous time
         function adjustContinuousTime(amount) {
             let newVal = CONFIG.continuous + amount;
             if (newVal < 1) newVal = 1; if (newVal > 180) newVal = 180;
@@ -1239,11 +1361,9 @@
             if (timerState.mode === 'continuous') resetTimer();
         }
 
-        // Set Mode
         function setMode(mode) {
             timerState.mode = mode; 
             
-            // Dừng bộ đếm đang chạy ngầm nếu chuyển chế độ
             if (timerState.isRunning) {
                 timerState.isRunning = false;
                 worker.postMessage('stop');
@@ -1294,7 +1414,6 @@
             updateDisplay(); updateControllerState(); updateMotivationUI();
         }
 
-        // Toggle Timer
         function updateDisplay() {
             const dispMin = String(timerState.minutes).padStart(2, '0'); const dispSec = String(timerState.seconds).padStart(2, '0');
             timerDisplay.textContent = `${dispMin}:${dispSec}`;
@@ -1305,12 +1424,12 @@
         function toggleTimer() {
             if (timerState.isRunning) { 
                 timerState.isRunning = false; 
-                worker.postMessage('stop'); // Gửi yêu cầu tắt đếm giờ ngầm cho Web Worker
+                worker.postMessage('stop');
                 showToast("Đã tạm dừng đếm ngược.", "amber"); 
             } 
             else { 
                 timerState.isRunning = true; 
-                worker.postMessage('start'); // Yêu cầu Web Worker khởi chạy đếm giờ trong thread riêng biệt
+                worker.postMessage('start');
                 showToast("Bắt đầu tập trung!", "emerald"); 
             }
             updateControllerState(); updateMotivationUI();
@@ -1318,7 +1437,7 @@
 
         function resetTimer() {
             timerState.isRunning = false; 
-            worker.postMessage('stop'); // Luôn bảo đảm dừng worker trước khi reset
+            worker.postMessage('stop');
             timerState.minutes = timerState.mode === 'continuous' ? CONFIG.continuous : CONFIG[timerState.mode];
             timerState.seconds = 0; timerState.totalDurationSeconds = timerState.minutes * 60;
             updateDisplay(); updateControllerState(); updateMotivationUI();
@@ -1349,7 +1468,7 @@
 
         function handleSessionFinished() {
             timerState.isRunning = false; 
-            worker.postMessage('stop'); // Dừng đếm ngầm khi hoàn thành phiên
+            worker.postMessage('stop');
             updateControllerState();
             let gainedXp = 0; let finishedModeLabel = ""; let minutesAwarded = 0;
 
@@ -1360,13 +1479,11 @@
 
             stats.xp += gainedXp; stats.totalFocusMinutes += minutesAwarded;
             
-            // Log Deep Stats - Distribution modes
             if (!stats.modeDistribution) stats.modeDistribution = { pomodoro: 0, english60: 0, math120: 0, continuous: 0 };
             if (stats.modeDistribution[timerState.mode] !== undefined) {
                 stats.modeDistribution[timerState.mode] += minutesAwarded;
             }
 
-            // Log Hourly Statistics (0-23)
             const currentHour = new Date().getHours();
             if (!stats.hourlyActivity || stats.hourlyActivity.length !== 24) {
                 stats.hourlyActivity = Array(24).fill(0);
@@ -1390,20 +1507,24 @@
             floater.className = "absolute text-xs font-black text-emerald-600 dark:text-emerald-400 select-none animate-bounce duration-1000";
             floater.style.left = "50%"; floater.style.top = "60%"; floater.style.transform = "translateX(-50%)";
             floater.innerHTML = `+${val} XP`;
-            container.appendChild(floater); setTimeout(() => floater.remove(), 1800);
+            if (container) container.appendChild(floater); 
+            setTimeout(() => floater.remove(), 1800);
         }
 
-        // Tác vụ tăng cấp
         function levelCheckAndCalculation() {
             const xpNeededForNextLevel = stats.level * 350;
             if (stats.xp >= xpNeededForNextLevel) { stats.xp -= xpNeededForNextLevel; stats.level++; showToast(`Đột phá cấp độ! Bạn đã đạt Cấp ${stats.level}!`, "emerald"); }
             let title = "Tập Sự";
-            if (stats.level >= 3 && stats.level < 6) title = "Học Giả"; else if (stats.level >= 6 && stats.level < 10) title = "Tri Thức"; else if (stats.level >= 10 && stats.level < 15) title = "Hiền Triết"; else if (stats.level >= 15) title = "Vĩ Nhân Kỷ Luật";
-            userRank.textContent = title; userLevel.textContent = stats.level;
-            xpBar.style.width = `${Math.min(100, (stats.xp / (stats.level * 350)) * 100)}%`;
+            if (stats.level >= 3 && stats.level < 6) title = "Học Giả"; 
+            else if (stats.level >= 6 && stats.level < 10) title = "Tri Thức"; 
+            else if (stats.level >= 10 && stats.level < 15) title = "Hiền Triết"; 
+            else if (stats.level >= 15) title = "Vĩ Nhân Kỷ Luật";
+            
+            if (userRank) userRank.textContent = title; 
+            if (userLevel) userLevel.textContent = stats.level;
+            if (xpBar) xpBar.style.width = `${Math.min(100, (stats.xp / (stats.level * 350)) * 100)}%`;
         }
 
-        // Tasks logic
         function addTask(event) {
             event.preventDefault(); const text = taskInput.value.trim(); if (!text) return;
             const newTask = { id: crypto.randomUUID(), text: text, completed: false, focusSeconds: 0, createdAt: new Date().toISOString() };
@@ -1429,6 +1550,7 @@
             return m > 0 ? `${m}p ${s}s` : `${s} giây`;
         }
         function renderTasks() {
+            if (!tasksList) return;
             tasksList.innerHTML = ""; let completedCount = 0;
             const sortedTasks = [...tasks].sort((a, b) => { if (a.completed === b.completed) return new Date(b.createdAt) - new Date(a.createdAt); return a.completed ? 1 : -1; });
 
@@ -1454,7 +1576,7 @@
                 tasksList.appendChild(li);
             });
 
-            taskCounter.textContent = `${completedCount}/${tasks.length} Hoàn thành`;
+            if (taskCounter) taskCounter.textContent = `${completedCount}/${tasks.length} Hoàn thành`;
             const currentActive = tasks.find(t => t.id === stats.activeTaskId);
             if (currentActive && !currentActive.completed) {
                 activeTaskText.textContent = currentActive.text;
@@ -1467,9 +1589,7 @@
             lucide.createIcons();
         }
 
-        // --- NEW: SYSTEM SETTINGS MANAGEMENT ---
         function openSettingsModal() {
-            // Nạp thông tin hiện tại vào UI cài đặt
             document.getElementById('settings-volume').value = appVolume;
             document.getElementById('volume-percentage').textContent = `${appVolume}%`;
             document.getElementById('input-pomo').value = CONFIG.pomodoro;
@@ -1488,10 +1608,8 @@
         }
 
         function saveAllSettings() {
-            // 1. Lưu cấu hình âm lượng
             localStorage.setItem('focusflow_volume', appVolume);
 
-            // 2. Lưu cấu hình chu kỳ mặc định
             const inputPomoVal = parseInt(document.getElementById('input-pomo').value);
             const inputShortVal = parseInt(document.getElementById('input-short').value);
             
@@ -1507,15 +1625,14 @@
             showToast("Đã lưu toàn bộ thiết lập hệ thống!", "emerald");
         }
 
-        // Toasts & Modals
         function showToast(msg, colorTheme = "emerald") {
             const toast = document.getElementById('toast-notif');
             const text = document.getElementById('toast-text');
             const dot = document.getElementById('toast-dot');
+            if(!toast || !text || !dot) return;
             text.textContent = msg;
             
-            const isDark = document.documentElement.classList.contains('dark');
-            const baseClass = "fixed bottom-6 right-6 transform px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 z-[100] text-xs max-w-xs";
+            const baseClass = "fixed bottom-6 right-6 transform px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 z-[110] text-xs max-w-xs";
             
             if (colorTheme === "amber") {
                 dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]";
@@ -1524,12 +1641,79 @@
                 dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]";
                 toast.className = `${baseClass} bg-white dark:bg-gray-950 border border-slate-200 dark:border-emerald-900/30 text-slate-800 dark:text-gray-100 translate-y-0 opacity-100`;
             }
-            setTimeout(() => { toast.classList.replace('translate-y-0', 'translate-y-20'); toast.classList.replace('opacity-100', 'opacity-0'); }, 3500);
+            setTimeout(() => { 
+                toast.classList.replace('translate-y-0', 'translate-y-20'); 
+                toast.classList.replace('opacity-100', 'opacity-0'); 
+            }, 3500);
         }
 
-        function saveDataToStorage() { 
+        // Offline Save to LocalStorage fallback
+        function saveLocalFallback() {
             localStorage.setItem('focusflow_stats', JSON.stringify(stats)); 
             localStorage.setItem('focusflow_tasks', JSON.stringify(tasks)); 
+        }
+
+        // Firestore Unified Save
+        async function saveDataToStorage() {
+            saveLocalFallback();
+            
+            // Critical Rule: Auth before query
+            const user = auth.currentUser;
+            if (!user) return;
+
+            try {
+                // RULE 1: Strict collection naming paths
+                const statsDocPath = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'stats');
+                const tasksDocPath = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'tasks');
+
+                await setDoc(statsDocPath, stats, { merge: true });
+                await setDoc(tasksDocPath, { list: tasks });
+
+                // Update UI sync badge status
+                document.getElementById('header-sync-status').innerHTML = `<span class="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span> Đã Đồng Bộ`;
+                document.getElementById('header-sync-status').className = "text-[8px] text-emerald-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5";
+            } catch (error) {
+                console.error("Firestore cloud backup failed:", error);
+            }
+        }
+
+        // Firestore Unified Fetch
+        async function fetchCloudDataAndMerge(user) {
+            if (!user) return;
+            try {
+                // RULE 1: Strict path syntax format
+                const statsDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'stats');
+                const tasksDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'tasks');
+
+                const statsSnap = await getDoc(statsDocRef);
+                const tasksSnap = await getDoc(tasksDocRef);
+
+                if (statsSnap.exists()) {
+                    stats = statsSnap.data();
+                } else {
+                    // No cloud profile exists, bootstrap user profile stats
+                    await setDoc(statsDocRef, stats);
+                }
+
+                if (tasksSnap.exists()) {
+                    tasks = tasksSnap.data().list || [];
+                } else {
+                    // Seed initial cloud task configuration
+                    await setDoc(tasksDocRef, { list: tasks });
+                }
+
+                // Render components with cloud populated values
+                renderTasks();
+                evaluateStreakAndCheck();
+                levelCheckAndCalculation();
+                generateActivityHeatmap();
+                updateMotivationUI();
+
+                document.getElementById('header-sync-status').innerHTML = `<span class="w-1 h-1 rounded-full bg-emerald-500"></span> Đã Đồng Bộ`;
+                document.getElementById('header-sync-status').className = "text-[8px] text-emerald-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5";
+            } catch (error) {
+                console.error("Cloud database syncing failed, operating offline: ", error);
+            }
         }
 
         function loadDataFromStorage() {
@@ -1537,15 +1721,9 @@
             const savedStats = localStorage.getItem('focusflow_stats'); if (savedStats) stats = JSON.parse(savedStats);
             const savedTasks = localStorage.getItem('focusflow_tasks'); if (savedTasks) tasks = JSON.parse(savedTasks);
             
-            // Tải mức âm lượng từ bộ nhớ
             const savedVolume = localStorage.getItem('focusflow_volume');
-            if (savedVolume !== null) {
-                appVolume = parseInt(savedVolume);
-            } else {
-                appVolume = 100; // Giá trị gốc ban đầu
-            }
+            appVolume = savedVolume !== null ? parseInt(savedVolume) : 100;
 
-            // Retroactive structures setup
             if(!stats.modeDistribution) stats.modeDistribution = { pomodoro: 0, english60: 0, math120: 0, continuous: 0 };
             if(!stats.hourlyActivity || stats.hourlyActivity.length !== 24) stats.hourlyActivity = Array(24).fill(0);
         }
@@ -1561,18 +1739,211 @@
             setTimeout(() => { window.location.reload(); }, 1000);
         }
 
-        // Boot
+        function openAuthModal() {
+            document.getElementById('auth-modal').classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        function switchAuthView(view) {
+            activeAuthView = view;
+            const tabLogin = document.getElementById('auth-tab-login');
+            const tabSignup = document.getElementById('auth-tab-signup');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const confirmPasswordGroup = document.getElementById('auth-confirm-password-container');
+
+            if (view === 'login') {
+                tabLogin.className = "py-2 text-[10px] sm:text-xs rounded-lg font-bold transition bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 shadow-sm";
+                tabSignup.className = "py-2 text-[10px] sm:text-xs rounded-lg font-bold transition text-slate-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-gray-200";
+                submitBtn.textContent = "Đăng Nhập";
+                confirmPasswordGroup.classList.add('hidden');
+            } else {
+                tabSignup.className = "py-2 text-[10px] sm:text-xs rounded-lg font-bold transition bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 shadow-sm";
+                tabLogin.className = "py-2 text-[10px] sm:text-xs rounded-lg font-bold transition text-slate-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-gray-200";
+                submitBtn.textContent = "Đăng Ký Tài Khoản";
+                confirmPasswordGroup.classList.remove('hidden');
+            }
+        }
+
+        // Email & Password Auth Handler
+        async function handleEmailAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value;
+            const confirmPassword = document.getElementById('auth-confirm-password').value;
+
+            if (activeAuthView === 'signup') {
+                if (password !== confirmPassword) {
+                    showToast("Mật khẩu xác nhận không khớp!", "amber");
+                    return;
+                }
+                try {
+                    showToast("Đang tạo tài khoản...", "emerald");
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    showToast("Đăng ký thành công!", "emerald");
+                    closeAuthModal();
+                } catch (error) {
+                    console.error("Signup failure:", error);
+                    showToast("Đăng ký thất bại: " + error.message, "amber");
+                }
+            } else {
+                try {
+                    showToast("Đang xác thực thông tin...", "emerald");
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showToast("Đăng nhập thành công!", "emerald");
+                    closeAuthModal();
+                } catch (error) {
+                    console.error("Login failure:", error);
+                    showToast("Sai email hoặc mật khẩu!", "amber");
+                }
+            }
+        }
+
+        // Google Quick Login OAuth Handler
+        async function handleGoogleLogin() {
+            try {
+                showToast("Đang kết nối Google...", "emerald");
+                const provider = new GoogleAuthProvider();
+                await signInWithPopup(auth, provider);
+                showToast("Liên kết Google thành công!", "emerald");
+                closeAuthModal();
+            } catch (error) {
+                console.error("Google login failure:", error);
+                showToast("Kết nối Google thất bại!", "amber");
+            }
+        }
+
+        // Guest / Anonymous Log in Handler
+        async function handleGuestLogin() {
+            try {
+                showToast("Đang khởi tạo phiên Khách...", "emerald");
+                await signInAnonymously(auth);
+                showToast("Đã tiếp tục dưới quyền Khách!", "emerald");
+                closeAuthModal();
+            } catch (error) {
+                console.error("Anonymous login failure:", error);
+                showToast("Khởi tạo quyền khách thất bại!", "amber");
+            }
+        }
+
+        // Sign Out Handler
+        async function handleLogout() {
+            try {
+                showToast("Đang đăng xuất khỏi hệ thống...", "amber");
+                await signOut(auth);
+                showToast("Đã đăng xuất tài khoản.", "emerald");
+                closeAuthModal();
+            } catch (error) {
+                console.error("Sign out failure:", error);
+                showToast("Đăng xuất thất bại!", "amber");
+            }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            const userProfileBadge = document.getElementById('user-profile-badge');
+            const headerUserName = document.getElementById('header-user-name');
+            const headerSyncStatus = document.getElementById('header-sync-status');
+            const userAvatarContainer = document.getElementById('user-avatar-container');
+
+            const authLoggedInView = document.getElementById('auth-logged-in-view');
+            const authLoggedOutView = document.getElementById('auth-logged-out-view');
+
+            if (user) {
+                // Update Badge Header information
+                const displayName = user.displayName || user.email?.split('@')[0] || "Khách Ẩn Danh";
+                headerUserName.textContent = displayName;
+                
+                headerSyncStatus.innerHTML = `<span class="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span> Trực tuyến`;
+                headerSyncStatus.className = "text-[8px] text-emerald-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5";
+
+                if (user.photoURL) {
+                    userAvatarContainer.innerHTML = `<img src="${user.photoURL}" class="w-full h-full object-cover">`;
+                } else {
+                    userAvatarContainer.innerHTML = `<div class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">${displayName.charAt(0)}</div>`;
+                }
+
+                // Update Authentication Drawer UI elements
+                authLoggedInView.classList.remove('hidden');
+                authLoggedOutView.classList.add('hidden');
+
+                document.getElementById('profile-large-avatar').innerHTML = user.photoURL ? 
+                    `<img src="${user.photoURL}" class="w-full h-full rounded-full object-cover">` : 
+                    displayName.charAt(0);
+                document.getElementById('profile-display-name').textContent = displayName;
+                document.getElementById('profile-display-email').textContent = user.email || "Không có Email liên kết (Khách)";
+                document.getElementById('profile-auth-provider').textContent = user.isAnonymous ? "Trải Nghiệm Khách" : "Liên Kết Đám Mây";
+
+                // Synchronize and Fetch Cloud Profile Stats
+                await fetchCloudDataAndMerge(user);
+            } else {
+                // UI state reset for guest and offline contexts
+                headerUserName.textContent = "Chưa Đăng Nhập";
+                headerSyncStatus.innerHTML = `<span class="w-1 h-1 rounded-full bg-amber-500"></span> Offline`;
+                headerSyncStatus.className = "text-[8px] text-amber-500 font-semibold flex items-center gap-0.5 leading-none mt-0.5";
+                userAvatarContainer.innerHTML = `<i data-lucide="user" class="w-3.5 h-3.5 text-slate-600 dark:text-gray-300"></i>`;
+
+                authLoggedInView.classList.add('hidden');
+                authLoggedOutView.classList.remove('hidden');
+
+                // MANDATORY RULE: Always signInAnonymously to authenticate before queries are accessible
+                await signInAnonymously(auth);
+            }
+            lucide.createIcons();
+        });
+
+        window.toggleTheme = toggleTheme;
+        window.setMode = setMode;
+        window.toggleTimer = toggleTimer;
+        window.resetTimer = resetTimer;
+        window.adjustContinuousTime = adjustContinuousTime;
+        window.onContinuousSliderChange = onContinuousSliderChange;
+        window.addTask = addTask;
+        window.toggleTaskComplete = toggleTaskComplete;
+        window.deleteTask = deleteTask;
+        window.selectActiveTask = selectActiveTask;
+        window.openSettingsModal = openSettingsModal;
+        window.closeSettingsModal = closeSettingsModal;
+        window.onVolumeSliderChange = onVolumeSliderChange;
+        window.testTickSound = testTickSound;
+        window.testChimeSound = testChimeSound;
+        window.saveAllSettings = saveAllSettings;
+        window.openStatsModal = openStatsModal;
+        window.closeStatsModal = closeStatsModal;
+        window.openGuideModal = openGuideModal;
+        window.closeGuideModal = closeGuideModal;
+        window.openResetModal = openResetModal;
+        window.closeResetModal = closeResetModal;
+        window.executeResetAllData = executeResetAllData;
+        window.openAuthModal = openAuthModal;
+        window.closeAuthModal = closeAuthModal;
+        window.switchAuthView = switchAuthView;
+        window.handleEmailAuth = handleEmailAuth;
+        window.handleGoogleLogin = handleGoogleLogin;
+        window.handleGuestLogin = handleGuestLogin;
+        window.handleLogout = handleLogout;
+
         window.onload = function() {
             updateThemeIcon();
             loadDataFromStorage();
-            document.getElementById('continuous-slider').value = CONFIG.continuous;
-            continuousValText.textContent = `${CONFIG.continuous}m`;
+            
+            const continuousSliderEl = document.getElementById('continuous-slider');
+            if (continuousSliderEl) continuousSliderEl.value = CONFIG.continuous;
+            if (continuousValText) continuousValText.textContent = `${CONFIG.continuous}m`;
 
-            setMode('pomodoro'); renderTasks(); evaluateStreakAndCheck(); levelCheckAndCalculation();
-            generateActivityHeatmap(); updateMotivationUI(); 
+            setMode('pomodoro'); 
+            renderTasks(); 
+            evaluateStreakAndCheck(); 
+            levelCheckAndCalculation();
+            generateActivityHeatmap(); 
+            updateMotivationUI(); 
+            
             lucide.createIcons();
             
-            setTimeout(() => { showToast("Chào mừng bạn trở lại hành trình rèn luyện!", "emerald"); }, 800);
+            setTimeout(() => { 
+                showToast("Chào mừng bạn trở lại hành trình rèn luyện!", "emerald"); 
+            }, 800);
         }
     </script>
 </body>
