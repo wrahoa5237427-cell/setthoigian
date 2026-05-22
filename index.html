@@ -3524,6 +3524,12 @@
                     if (!stats.gold && stats.gold !== 0) stats.gold = 100;
                     if (!stats.consecutivePomos && stats.consecutivePomos !== 0) stats.consecutivePomos = 0;
                     if (!stats.pet) stats.pet = { level: 1, hp: 100, name: "Trứng Đồng Hành", xp: 0 };
+                    
+                    // Bổ sung các giá trị mặc định để tránh lỗi văng app khi update UI
+                    if (!stats.dailyActivity) stats.dailyActivity = {};
+                    if (!stats.hourlyActivity) stats.hourlyActivity = Array(24).fill(0);
+                    if (!stats.modeDistribution) stats.modeDistribution = { pomodoro: 0, english60: 0, math120: 0, continuous: 0 };
+                    if (!stats.events) stats.events = [];
                 } else {
                     await setDoc(statsDocRef, stats);
                 }
@@ -3542,6 +3548,7 @@
                     syncStatusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Đã đồng bộ`;
                 }
             } catch (e) {
+                console.error("Chi tiết lỗi đồng bộ:", e); // Log ra console để dễ debug nếu có lỗi thật
                 if (syncStatusEl) {
                     syncStatusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Lỗi đám mây`;
                     syncStatusEl.className = "text-[8px] text-red-500 font-semibold flex items-center gap-1 mt-0.5";
