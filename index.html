@@ -187,6 +187,15 @@
                 </div>
             </div>
 
+            <!-- Real-time Vietnam Clock & Date -->
+            <div class="hidden xl:flex items-center gap-4 bg-slate-100/50 dark:bg-slate-900/50 px-4 py-2 rounded-2xl border border-slate-200/50 dark:border-slate-800/50">
+                <div class="flex flex-col items-end">
+                    <div id="vietnam-clock" class="timer-font text-sm font-black text-emerald-600 dark:text-emerald-400 tracking-wider leading-none">00:00:00</div>
+                    <div id="vietnam-date" class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter mt-1">Đang tải ngày...</div>
+                </div>
+                <i data-lucide="clock" class="w-4 h-4 text-slate-400"></i>
+            </div>
+
             <!-- Profile, Cloud Sync, Themes & Levels -->
             <div class="flex flex-wrap items-center justify-center gap-3 md:gap-4">
                 
@@ -446,7 +455,8 @@
                     <div class="grid grid-cols-2 gap-2">
                         <select id="ambient-sound-select" onchange="onAmbientSelectChange(this.value)" class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl px-2.5 py-2 text-slate-800 dark:text-slate-100 focus:outline-none font-bold">
                             <option value="none">🔇 Tắt tiếng nền</option>
-                            <option value="pink">🫧 Tiếng Hồng (Pink Noise)</option>
+                            <option value="brown">🤎 Tiếng Nâu (Học sâu)</option>
+                            <option value="pink">🔊 Tiếng Hồng (Tập trung)</option>
                             <option value="rain">🌧️ Mưa rào mềm mại</option>
                             <option value="ocean">🌊 Sóng biển rì rào</option>
                         </select>
@@ -1345,7 +1355,7 @@
                 }
             } else {
                 if (currentAmbientType === 'none') {
-                    currentAmbientType = select.value !== 'none' ? select.value : 'pink';
+                    currentAmbientType = select.value !== 'none' ? select.value : 'brown';
                     select.value = currentAmbientType;
                 }
                 playAmbientSound(currentAmbientType);
@@ -1394,13 +1404,16 @@
             
             ambientFilterNode = audioCtx.createBiquadFilter();
 
-            if (type === 'pink') {
+            if (type === 'pink' || type === 'brown') {
                 ambientFilterNode.type = 'lowpass';
-                ambientFilterNode.frequency.setValueAtTime(450, audioCtx.currentTime);
+                // Tiếng nâu trầm hơn tiếng hồng, giúp tập trung sâu hơn
+                const freq = type === 'brown' ? 280 : 500;
+                ambientFilterNode.frequency.setValueAtTime(freq, audioCtx.currentTime);
                 
                 ambientSource.connect(ambientFilterNode);
                 ambientFilterNode.connect(ambientGainNode);
-                ambientGainNode.gain.linearRampToValueAtTime(0.12 * getVolumeMultiplier(), audioCtx.currentTime + 1.5);
+                const baseVol = type === 'brown' ? 0.18 : 0.12;
+                ambientGainNode.gain.linearRampToValueAtTime(baseVol * getVolumeMultiplier(), audioCtx.currentTime + 1.5);
             } else if (type === 'rain') {
                 ambientFilterNode.type = 'peaking';
                 ambientFilterNode.frequency.setValueAtTime(900, audioCtx.currentTime);
@@ -1433,6 +1446,37 @@
                 ambientGainNode.gain.linearRampToValueAtTime(0.06 * getVolumeMultiplier(), audioCtx.currentTime + 1.5);
                 
                 lfoNode.start();
+            } else if (type === 'birds' || type === 'forest' || type === 'jungle') {
+                // Giả lập tiếng chim hót bằng các Oscilator ngẫu nhiên
+                ambientSource.connect(ambientGainNode);
+                ambientGainNode.gain.linearRampToValueAtTime(0.1 * getVolumeMultiplier(), audioCtx.currentTime + 1.5);
+                
+                const interval = setInterval(() => {
+                    if (!isAmbientPlaying || (currentBreakEnv.sound !== type && currentAmbientType !== type)) {
+                        clearInterval(interval); return;
+                    }
+                    let bird = audioCtx.createOscillator();
+                    let birdGain = audioCtx.createGain();
+                    bird.connect(birdGain); birdGain.connect(audioCtx.destination);
+                    bird.type = 'sine';
+                    bird.frequency.setValueAtTime(1500 + Math.random() * 2000, audioCtx.currentTime);
+                    birdGain.gain.setValueAtTime(0, audioCtx.currentTime);
+                    birdGain.gain.linearRampToValueAtTime(0.05 * getVolumeMultiplier(), audioCtx.currentTime + 0.05);
+                    birdGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+                    bird.start(); bird.stop(audioCtx.currentTime + 0.3);
+                }, 2000 + Math.random() * 3000);
+            } else if (type === 'crickets') {
+                // Giả lập tiếng dế mèn bằng xung nhịp nhanh
+                ambientSource.connect(ambientGainNode);
+                ambientGainNode.gain.linearRampToValueAtTime(0.05 * getVolumeMultiplier(), audioCtx.currentTime + 1.5);
+                const cricketOsc = audioCtx.createOscillator();
+                const cricketGain = audioCtx.createGain();
+                cricketOsc.type = 'square'; cricketOsc.frequency.setValueAtTime(4000, audioCtx.currentTime);
+                cricketGain.gain.setValueAtTime(0, audioCtx.currentTime);
+                const lfo = audioCtx.createOscillator(); lfo.frequency.setValueAtTime(10, audioCtx.currentTime);
+                lfo.connect(cricketGain.gain); cricketOsc.connect(cricketGain); cricketGain.connect(audioCtx.destination);
+                cricketOsc.start(); lfo.start();
+                ambientSource.onended = () => { cricketOsc.stop(); lfo.stop(); };
             }
 
             ambientGainNode.connect(audioCtx.destination);
@@ -1474,11 +1518,11 @@
 
         // Core App States
         let timerState = {
-            minutes: CONFIG.pomodoro,
+            minutes: parseInt(CONFIG.pomodoro) || 25,
             seconds: 0,
             mode: 'pomodoro', 
             isRunning: false,
-            totalDurationSeconds: CONFIG.pomodoro * 60
+            totalDurationSeconds: (parseInt(CONFIG.pomodoro) || 25) * 60
         };
 
         const workerScript = `
@@ -1580,13 +1624,20 @@
         ];
 
         // RESTORATION STRETCH LIST (ART Nature Recovery)
-        const biophilicStretches = [
-            "Vươn vai giải phóng cột sống, nhắm hờ mắt (10s) 🧘‍♀️",
-            "Xoay vai & hít thở nhịp nhàng theo sóng biển (15s) 🪷",
-            "Nhìn ra xa qua cửa sổ để điều tiết thuỷ tinh thể (Rule 20-20-20) 👀",
-            "Xoay khớp cổ 360 độ từ tốn giải tỏa hành tủy (12s) 💆",
-            "Uống một ngụm nước ấm nhỏ thanh lọc mao mạch máu (10s) 🥛"
+        const BREAK_ENVIRONMENTS = [
+            { id: 'autumn', name: 'Rừng Thu Trầm Mặc', type: 'leaf', color: '#b45309', sound: 'forest', stretch: 'Vươn vai giải phóng cột sống, nhắm hờ mắt 🍂' },
+            { id: 'rainy', name: 'Mưa Rào Nhiệt Đới', type: 'rain', color: '#38bdf8', sound: 'rain', stretch: 'Xoay vai & hít thở nhịp nhàng theo tiếng mưa 🌧️' },
+            { id: 'sakura', name: 'Hoa Anh Đào Nở', type: 'petal', color: '#f472b6', sound: 'zen', stretch: 'Nhìn ra xa để điều tiết thủy tinh thể 🌸' },
+            { id: 'ocean', name: 'Sóng Biển Rì Rào', type: 'bubble_up', color: '#0ea5e9', sound: 'ocean', stretch: 'Xoay khớp cổ từ tốn giải tỏa căng thẳng 🌊' },
+            { id: 'night', name: 'Đom Đóm Trong Đêm', type: 'firefly', color: '#fde047', sound: 'crickets', stretch: 'Nhắm mắt sâu, thả lỏng toàn bộ cơ mặt 🌟' },
+            { id: 'snow', name: 'Tuyết Rơi Mùa Đông', type: 'snow', color: '#f8fafc', sound: 'wind', stretch: 'Hít thở sâu 4-7-8 để làm ấm cơ thể ❄️' },
+            { id: 'bamboo', name: 'Rừng Trúc Thanh Tịnh', type: 'bamboo_leaf', color: '#65a30d', sound: 'forest', stretch: 'Xoay cổ tay và cổ chân nhẹ nhàng 🎋' },
+            { id: 'underwater', name: 'Thế Giới Thủy Cung', type: 'bubble_slow', color: '#2dd4bf', sound: 'underwater', stretch: 'Duỗi thẳng chân và xoay khớp háng 🫧' },
+            { id: 'meadow', name: 'Cánh Đồng Hoa Cỏ', type: 'pollen', color: '#fbbf24', sound: 'birds', stretch: 'Uống một ngụm nước ấm nhỏ thanh lọc cơ thể 🌼' },
+            { id: 'jungle', name: 'Rừng Già Kỳ Bí', type: 'big_leaf', color: '#166534', sound: 'jungle', stretch: 'Massage nhẹ vùng thái dương và hốc mắt 🦜' }
         ];
+
+        let currentBreakEnv = BREAK_ENVIRONMENTS[0];
 
         const timerDisplay = document.getElementById('timer-display');
         const timerLabel = document.getElementById('timer-label');
@@ -1618,12 +1669,17 @@
         // Realtime Clock setup (Vietnam Localized Clock)
         function updateVietnamClock() {
             const clockEl = document.getElementById('vietnam-clock');
-            if(!clockEl) return;
+            const dateEl = document.getElementById('vietnam-date');
+            if(!clockEl || !dateEl) return;
+            
             const now = new Date();
-            const hrs = String(now.getHours()).padStart(2, '0');
-            const mins = String(now.getMinutes()).padStart(2, '0');
-            const secs = String(now.getSeconds()).padStart(2, '0');
-            clockEl.textContent = `${hrs}:${mins}:${secs}`;
+            
+            // Hiển thị giờ VN: HH:mm:ss
+            clockEl.textContent = now.toLocaleTimeString('vi-VN', { hour12: false });
+            
+            // Hiển thị ngày VN: Thứ..., ngày... tháng...
+            const dateOptions = { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' };
+            dateEl.textContent = now.toLocaleDateString('vi-VN', dateOptions);
 
             updateAllCountdowns();
         }
@@ -1792,7 +1848,7 @@
             // Render natural restoration animations (ART) if in rest mode
             if (timerState.mode === 'short' || timerState.mode === 'long') {
                 if (biophilicParticles.length === 0) {
-                    initBiophilicRestoration(timerState.mode);
+                    initBiophilicRestoration();
                 }
                 canvas.style.opacity = "0.7"; // Make it highly visible on breaks
                 biophilicParticles.forEach(p => {
@@ -2178,29 +2234,29 @@
             past7.forEach(d => {
                 const mins = stats.dailyActivity[d] || 0;
                 const percent = Math.max((mins / maxMin) * 100, 2);
-                const dayLabel = new Date(d).toLocaleDateString('vi-VN', {weekday: 'short'});
+                const dayLabel = new Date(d).toLocaleDateString('vi-VN', {weekday: 'narrow'});
                 
                 const barCol = document.createElement('div');
-                barCol.className = "flex flex-col items-center justify-end h-full w-full gap-2";
+                barCol.className = "flex flex-col items-center justify-end h-full w-full gap-2 relative pt-6";
                 
                 const barWrapper = document.createElement('div');
-                barWrapper.className = "w-6 sm:w-10 bg-slate-100 dark:bg-slate-800 rounded-t-lg h-full relative flex items-end overflow-hidden";
+                barWrapper.className = "w-6 sm:w-10 bg-slate-100 dark:bg-slate-800/50 rounded-t-xl h-full relative flex items-end shadow-inner";
                 
                 const barCore = document.createElement('div');
-                barCore.className = "w-full bg-gradient-to-t from-emerald-600 to-teal-400 bar-grow";
+                barCore.className = "w-full bg-gradient-to-t from-emerald-600 via-emerald-500 to-teal-400 bar-grow rounded-t-xl shadow-[0_0_15px_rgba(16,185,129,0.2)]";
                 barCore.style.height = `${percent}%`;
                 
                 const barValue = document.createElement('div');
-                barValue.className = "absolute top-1 left-0 right-0 text-center text-[8px] font-mono font-bold text-slate-700 dark:text-slate-300 pointer-events-none z-10";
-                barValue.textContent = mins > 0 ? `${mins}m` : '';
+                barValue.className = "absolute -top-5 left-0 right-0 text-center text-[9px] font-black text-emerald-600 dark:text-emerald-400 timer-font";
+                barValue.textContent = mins > 0 ? `${mins}p` : '';
 
                 barWrapper.appendChild(barCore);
-                barWrapper.appendChild(barValue);
 
                 const labelSpan = document.createElement('span');
-                labelSpan.className = "text-[9px] font-bold text-slate-500 dark:text-slate-400 capitalize";
+                labelSpan.className = "text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase";
                 labelSpan.textContent = dayLabel;
 
+                barCol.appendChild(barValue);
                 barCol.appendChild(barWrapper);
                 barCol.appendChild(labelSpan);
                 chartContainer.appendChild(barCol);
@@ -2291,7 +2347,7 @@
                 return;
             }
             timerState.mode = mode;
-            let mins = CONFIG[mode] || 25;
+            let mins = parseInt(CONFIG[mode]) || 25;
             
             const artPanel = document.getElementById('art-restoration-status');
 
@@ -2337,22 +2393,11 @@
                 progressCircle.setAttribute('stroke', '#f59e0b');
                 timerCard.className = timerCard.className.replace(/glow-\w+/g, 'glow-orange');
                 
-                // Show biophilic stretch prompts (ART Restoration)
                 if (artPanel) {
                     artPanel.classList.remove('hidden');
-                    const randomStretch = biophilicStretches[Math.floor(Math.random() * biophilicStretches.length)];
-                    document.getElementById('active-stretch-prompt').textContent = randomStretch;
                 }
 
-                // Kaplan's Biophilic Nature recovery autostart: Set gentle natural soundtrack automatically
-                if (currentAmbientType === 'none') {
-                    onAmbientSelectChange('rain');
-                    document.getElementById('ambient-sound-select').value = 'rain';
-                    if (!isAmbientPlaying) {
-                        toggleAmbientPlayback();
-                    }
-                }
-                initBiophilicRestoration(mode);
+                initBiophilicRestoration();
             } else if (mode === 'continuous') {
                 btnContinuousMode.className = "flex-grow h-9 flex items-center justify-center text-[10px] sm:text-xs rounded-lg transition-all duration-200 font-bold bg-blue-500 text-white dark:text-slate-950 shadow-lg gap-1.5";
                 timerLabel.className = "text-[9px] uppercase tracking-widest text-blue-600 dark:text-blue-400 mt-2.5 font-bold bg-blue-100 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 px-2.5 py-0.5 rounded-full inline-block";
@@ -2442,12 +2487,16 @@
         }
 
         function updateTimerDisplay() {
-            const m = String(timerState.minutes).padStart(2, '0');
-            const s = String(timerState.seconds).padStart(2, '0');
+            // Đảm bảo giá trị luôn là số để tránh lỗi treo NaN:NaN
+            const displayMin = isNaN(timerState.minutes) ? 0 : timerState.minutes;
+            const displaySec = isNaN(timerState.seconds) ? 0 : timerState.seconds;
+
+            const m = String(displayMin).padStart(2, '0');
+            const s = String(displaySec).padStart(2, '0');
             timerDisplay.textContent = `${m}:${s}`;
 
-            const totalSec = timerState.totalDurationSeconds;
-            const currentSec = (timerState.minutes * 60) + timerState.seconds;
+            const totalSec = isNaN(timerState.totalDurationSeconds) ? 1 : timerState.totalDurationSeconds;
+            const currentSec = (displayMin * 60) + displaySec;
             const fraction = totalSec > 0 ? currentSec / totalSec : 0;
             const offset = 283 * fraction;
             progressCircle.style.strokeDashoffset = 283 - offset;
@@ -2487,8 +2536,12 @@
         }
 
         function tick() {
-            if (timerState.seconds === 0) {
-                if (timerState.minutes === 0) {
+            // Kiểm tra an toàn trước khi trừ giây
+            if (isNaN(timerState.minutes)) timerState.minutes = 0;
+            if (isNaN(timerState.seconds)) timerState.seconds = 0;
+
+            if (timerState.seconds <= 0) {
+                if (timerState.minutes <= 0) {
                     onTimerComplete();
                     return;
                 }
