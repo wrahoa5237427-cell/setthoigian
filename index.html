@@ -23,7 +23,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -34,11 +34,11 @@
             text-rendering: optimizeLegibility;
         }
         body {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             transition: background-color 0.4s ease, color 0.4s ease;
         }
         .timer-font {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Outfit', sans-serif;
             font-variant-numeric: tabular-nums;
         }
         /* Custom scrollbars */
@@ -77,14 +77,6 @@
             transform: scale(1.05);
             box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.4);
         }
-
-        /* Thêm Hardware Acceleration cho các phần tử chuyển động */
-        #timer-card, #progress-circle, .bar-grow, #pet-avatar {
-            will-change: transform, opacity;
-            backface-visibility: hidden;
-            transform: translateZ(0);
-        }
-
         
         /* Dynamic gaming-level cards glow effect */
         .rank-glow-0 { box-shadow: 0 0 15px rgba(148, 163, 184, 0.05); border-color: rgba(148, 163, 184, 0.2) !important; }
@@ -138,11 +130,11 @@
         }
         /* Progress ring transitions */
         .progress-transition {
-            transition: stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), stroke 0.5s ease;
+            transition: stroke-dashoffset 0.35s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s ease;
         }
         /* Bar chart animations */
         .bar-grow {
-            animation: growUp 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation: growUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
             transform-origin: bottom;
             transform: scaleY(0);
         }
@@ -156,7 +148,6 @@
             display: none;
         }
     </style>
-    <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-[#f8fafc] dark:bg-darkbg text-slate-800 dark:text-gray-100 min-h-screen flex flex-col justify-between overflow-x-hidden relative pb-8">
 
@@ -224,12 +215,6 @@
                 <!-- Theme Toggle -->
                 <button onclick="toggleTheme()" class="p-2.5 rounded-2xl bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-sky-300 transition-all duration-300 shadow-sm" title="Đổi giao diện">
                     <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
-                </button>
-
-                <!-- Notification History Toggle -->
-                <button onclick="openNotificationModal()" class="p-2.5 rounded-2xl bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-emerald-400 transition-all duration-300 shadow-sm relative" title="Lịch sử thông báo">
-                    <i data-lucide="bell" class="w-4 h-4"></i>
-                    <span id="notification-dot" class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full hidden border-2 border-white dark:border-slate-900"></span>
                 </button>
 
                 <!-- Settings Cog Icon -->
@@ -504,8 +489,7 @@
                     </h3>
                     
                     <div class="flex items-center gap-3">
-                        <button onclick="openStatsModal()" class="text-sm bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/50 px-6 py-3 rounded-xl font-bold uppercase tracking-wider hover:bg-indigo-100 dark:hover:bg-indigo-900 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 shadow-md">
-                        <button onclick="openStatsModal()" class="text-[10px] bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/50 px-2.5 py-1 rounded-md font-bold uppercase tracking-wider hover:bg-indigo-100 dark:hover:bg-indigo-900 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-1.5 shadow-sm">
+                        <button onclick="openStatsModal()" class="text-[10px] bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/50 px-2.5 py-1 rounded-md font-bold uppercase tracking-wider hover:bg-indigo-100 dark:hover:bg-indigo-900 transition flex items-center gap-1.5">
                             <i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Phân tích
                         </button>
                         <div class="flex items-center gap-1 text-[9px] text-slate-500 dark:text-slate-450 font-bold hidden sm:flex">
@@ -550,24 +534,6 @@
                         <span class="text-[9px] text-slate-400 dark:text-slate-500 uppercase font-bold block mb-1">Học mỗi ngày</span>
                         <span id="stat-avg-time" class="timer-font text-sm font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500 dark:from-emerald-400 dark:to-teal-300">0p / ngày</span>
                     </div>
-                </div>
-            </div>
-
-            <!-- DAILY QUESTS & SCHEDULE PANEL -->
-            <div class="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xl transition-all">
-                <div class="flex justify-between items-center mb-4 border-b border-slate-100 dark:border-slate-800/60 pb-3">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-gray-100 flex items-center gap-2.5">
-                        <i data-lucide="zap" class="w-4 h-4 text-yellow-500"></i> Nhiệm Vụ & Lịch Trình
-                    </h3>
-                    <button onclick="openScheduleModal()" class="text-[9px] font-bold bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md hover:bg-indigo-500 hover:text-white transition">Thiết lập Lịch trình</button>
-                </div>
-                <div id="daily-quests-list" class="space-y-2 mb-4"></div>
-                <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[9px] font-black text-slate-400 uppercase">Hiện tại (Lịch biểu)</span>
-                        <span id="current-hour-display" class="text-[9px] font-bold text-indigo-500">00:00</span>
-                    </div>
-                    <div id="current-schedule-task" class="text-xs font-bold text-slate-700 dark:text-slate-200">✨ Đang trong thời gian tự học tự do</div>
                 </div>
             </div>
 
@@ -1041,21 +1007,6 @@
                     </div>
                 </div>
 
-                <!-- 2.5 Auto Transition Toggle -->
-                <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
-                    <div class="flex items-center gap-2.5">
-                        <i data-lucide="repeat" class="w-4 h-4 text-indigo-500"></i>
-                        <div>
-                            <span class="font-bold text-slate-750 dark:text-slate-200 block">Tự động chuyển phiên (Auto-Cycle)</span>
-                            <span class="text-[10px] text-slate-400 dark:text-slate-500 block">Tự động bắt đầu Nghỉ sau khi Học xong</span>
-                        </div>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input id="toggle-auto-transition" type="checkbox" class="sr-only peer">
-                        <div class="w-10 h-5 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500 peer-checked:after:bg-white"></div>
-                    </label>
-                </div>
-
                 <!-- 2. Pomo Cycle Settings -->
                 <div class="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl p-4 space-y-3">
                     <span class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
@@ -1073,11 +1024,6 @@
                         <div class="flex-1 flex flex-col items-center">
                             <span class="text-[9px] text-slate-400 font-bold uppercase mb-1">Nghỉ ngắn</span>
                             <input id="input-short" type="number" min="1" max="60" value="5" class="w-14 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md py-1 text-center font-mono font-bold text-slate-800 dark:text-slate-100 text-xs">
-                        </div>
-                        <span class="text-slate-300 dark:text-slate-750 font-bold text-sm">/</span>
-                        <div class="flex-1 flex flex-col items-center">
-                            <span class="text-[9px] text-slate-400 font-bold uppercase mb-1">Mục tiêu (p)</span>
-                            <input id="input-daily-goal" type="number" min="30" max="1440" value="120" class="w-14 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md py-1 text-center font-mono font-bold text-slate-800 dark:text-slate-100 text-xs">
                         </div>
                     </div>
                 </div>
@@ -1141,14 +1087,21 @@
                         <span>Chia nhỏ theo giờ học tập (0h - 23h)</span>
                         <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Khung giờ năng suất nhất của bạn</span>
                     </h4>
-                    <div class="h-48 w-full bg-slate-50/50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-3 flex flex-col justify-between relative">
-                        <div class="absolute inset-0 flex flex-col justify-between pointer-events-none px-4 pt-3 pb-10">
+                    <div class="h-36 w-full bg-slate-50/50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-3 flex items-end justify-between relative">
+                        <div class="absolute inset-0 flex flex-col justify-between pointer-events-none px-4 py-3">
                             <div class="border-b border-slate-200/50 dark:border-slate-800 w-full h-px border-dashed"></div>
                             <div class="border-b border-slate-200/50 dark:border-slate-800 w-full h-px border-dashed"></div>
                             <div class="border-b border-slate-200/50 dark:border-slate-800 w-full h-px border-dashed"></div>
                         </div>
-                        <div id="hourly-chart-container" class="w-full h-full flex items-end justify-between gap-[1px] relative z-10">
+                        <div id="hourly-chart-container" class="w-full h-full flex items-end justify-between gap-[2px] sm:gap-[4px] relative z-10">
                         </div>
+                    </div>
+                    <div class="flex justify-between text-[8px] text-slate-400 dark:text-slate-500 font-extrabold px-1 mt-1.5 uppercase tracking-wider">
+                        <span>00:00 (Đêm)</span>
+                        <span>06:00 (Sáng)</span>
+                        <span>12:00 (Trưa)</span>
+                        <span>18:00 (Chiều)</span>
+                        <span>23:00 (Tối)</span>
                     </div>
                 </div>
 
@@ -1190,50 +1143,6 @@
             
             <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-end">
                 <button onclick="closeStatsModal()" class="px-5 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition">Đóng phân tích</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- NOTIFICATION HISTORY MODAL -->
-    <div id="notification-modal" class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-955/85 backdrop-blur-md hidden transition-opacity duration-300">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden flex flex-col max-h-[80vh]">
-            <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-150 dark:border-slate-800">
-                <div class="flex items-center gap-2.5">
-                    <i data-lucide="history" class="w-5 h-5 text-emerald-500"></i>
-                    <h3 class="text-xs font-bold text-slate-800 dark:text-gray-100 uppercase tracking-widest">Nhật ký thông báo</h3>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="clearNotificationHistory()" class="text-[10px] text-red-500 font-bold uppercase hover:underline mr-2">Xóa hết</button>
-                    <button onclick="closeNotificationModal()" class="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div id="notification-list" class="overflow-y-auto pr-2 space-y-3 flex-grow custom-scrollbar">
-                <!-- Notifications will be injected here -->
-            </div>
-            
-            <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-end">
-                <button onclick="closeNotificationModal()" class="px-5 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider transition">Đóng</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- SCHEDULE MANAGEMENT MODAL -->
-    <div id="schedule-modal" class="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-955/85 backdrop-blur-md hidden">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl flex flex-col max-h-[85vh]">
-            <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-150 dark:border-slate-800">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="calendar-range" class="w-5 h-5 text-indigo-500"></i>
-                    <h3 class="text-xs font-bold uppercase tracking-widest">Thời khóa biểu cá nhân</h3>
-                </div>
-                <button onclick="closeScheduleModal()" class="text-slate-400 hover:text-slate-600 transition"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            <div class="overflow-y-auto pr-2 flex-grow space-y-3 custom-scrollbar" id="schedule-edit-list"></div>
-            <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex gap-3">
-                <button onclick="closeScheduleModal()" class="flex-1 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold uppercase">Đóng</button>
-                <button onclick="saveSchedule()" class="flex-1 py-3 rounded-xl bg-indigo-500 text-white text-xs font-bold uppercase shadow-lg">Lưu lịch trình</button>
             </div>
         </div>
     </div>
@@ -2320,40 +2229,36 @@
             const past7 = getPastDates(7);
             
             let maxMin = 10;
-            past7.forEach(d => { if ((stats.dailyActivity[d] || 0) > maxMin) maxMin = stats.dailyActivity[d]; });
+            past7.forEach(d => { if(stats.dailyActivity[d] > maxMin) maxMin = stats.dailyActivity[d]; });
 
             past7.forEach(d => {
                 const mins = stats.dailyActivity[d] || 0;
                 const percent = Math.max((mins / maxMin) * 100, 2);
-                const dateObj = new Date(d);
-                const dayLabel = dateObj.toLocaleDateString('vi-VN', {weekday: 'short'});
+                const dayLabel = new Date(d).toLocaleDateString('vi-VN', {weekday: 'narrow'});
                 
                 const barCol = document.createElement('div');
-                barCol.className = "flex flex-col items-center justify-end h-full w-full gap-1.5 relative pt-8";
+                barCol.className = "flex flex-col items-center justify-end h-full w-full gap-2 relative pt-6";
                 
                 const barWrapper = document.createElement('div');
-                barWrapper.className = "w-7 sm:w-12 bg-slate-100 dark:bg-slate-800/40 rounded-t-2xl h-full relative flex items-end shadow-inner group transition-all";
+                barWrapper.className = "w-6 sm:w-10 bg-slate-100 dark:bg-slate-800/50 rounded-t-xl h-full relative flex items-end shadow-inner";
                 
                 const barCore = document.createElement('div');
-                barCore.className = `w-full ${mins === maxMin ? 'bg-gradient-to-t from-indigo-600 to-sky-400' : 'bg-gradient-to-t from-emerald-600 to-teal-400'} bar-grow rounded-t-2xl shadow-lg transition-all duration-500`;
+                barCore.className = "w-full bg-gradient-to-t from-emerald-600 via-emerald-500 to-teal-400 bar-grow rounded-t-xl shadow-[0_0_15px_rgba(16,185,129,0.2)]";
                 barCore.style.height = `${percent}%`;
                 
                 const barValue = document.createElement('div');
-                barValue.className = `absolute -top-7 left-0 right-0 text-center text-[10px] font-black ${mins === maxMin ? 'text-indigo-500' : 'text-emerald-500'} timer-font transition-opacity`;
-                barValue.textContent = mins > 0 ? `${mins}m` : '';
+                barValue.className = "absolute -top-5 left-0 right-0 text-center text-[9px] font-black text-emerald-600 dark:text-emerald-400 timer-font";
+                barValue.textContent = mins > 0 ? `${mins}p` : '';
 
                 barWrapper.appendChild(barCore);
 
-                const labelContainer = document.createElement('div');
-                labelContainer.className = "text-center leading-tight";
-                labelContainer.innerHTML = `
-                    <span class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase block">${dayLabel}</span>
-                    <span class="text-[8px] text-slate-400 font-bold">${dateObj.getDate()}/${dateObj.getMonth()+1}</span>
-                `;
+                const labelSpan = document.createElement('span');
+                labelSpan.className = "text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase";
+                labelSpan.textContent = dayLabel;
 
                 barCol.appendChild(barValue);
                 barCol.appendChild(barWrapper);
-                barCol.appendChild(labelContainer);
+                barCol.appendChild(labelSpan);
                 chartContainer.appendChild(barCol);
             });
 
@@ -2364,41 +2269,22 @@
                 for (let h = 0; h < 24; h++) {
                     if ((stats.hourlyActivity[h] || 0) > maxHourMins) maxHourMins = stats.hourlyActivity[h];
                 }
-                
-                const peakHour = stats.hourlyActivity.indexOf(maxHourMins);
 
                 for (let h = 0; h < 24; h++) {
                     const hVal = stats.hourlyActivity[h] || 0;
                     const hPercent = Math.max((hVal / maxHourMins) * 100, 2);
                     
-                    const hourCol = document.createElement('div');
-                    hourCol.className = "flex flex-col items-center justify-end h-full w-[3.8%] gap-2";
-
                     const barCell = document.createElement('div');
-                    barCell.className = `w-full rounded-t-sm h-full relative flex items-end transition-all ${h === peakHour && hVal > 0 ? 'bg-indigo-500/10' : 'bg-transparent'}`;
-                    barCell.title = `${h}h:00 - ${hVal} phút`;
+                    barCell.className = "w-[4%] sm:w-[3.5%] bg-slate-100 dark:bg-slate-800 rounded-t h-full relative flex items-end overflow-hidden";
+                    barCell.title = `Khung giờ ${h}h: ${hVal} phút`;
                     
                     const barCore = document.createElement('div');
-                    barCore.className = `w-full bar-grow rounded-t-sm ${h === peakHour && hVal > 0 ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-emerald-500/60 dark:bg-emerald-400/30'}`;
+                    barCore.className = "w-full bg-emerald-500 bar-grow";
                     barCore.style.height = `${hPercent}%`;
 
-                    const label = document.createElement('span');
-                    label.className = `text-[8px] font-bold ${h === peakHour && hVal > 0 ? 'text-indigo-500' : 'text-slate-400'} whitespace-nowrap rotate-[-45deg] sm:rotate-0 mb-1 transition-colors duration-500`;
-                    label.textContent = `${h}h`;
-
                     barCell.appendChild(barCore);
-                    hourCol.appendChild(barCell);
-                    hourCol.appendChild(label);
-                    hourlyContainer.appendChild(hourCol);
+                    hourlyContainer.appendChild(barCell);
                 }
-            }
-
-            // Cập nhật text "Khung giờ năng suất" rõ ràng hơn
-            const peakHour = stats.hourlyActivity.indexOf(Math.max(...stats.hourlyActivity));
-            const peakVal = stats.hourlyActivity[peakHour] || 0;
-            const peakText = document.querySelector('#stats-modal h4 span.text-emerald-600');
-            if (peakText && peakVal > 0) {
-                peakText.innerHTML = `Giờ năng suất: <span class="text-indigo-500">${peakHour}h</span> (${peakVal}m)`;
             }
 
             const dist = stats.modeDistribution || { pomodoro: 0, english60: 0, math120: 0, continuous: 0 };
@@ -2450,8 +2336,6 @@
             document.getElementById('volume-percentage').textContent = `${appVolume}%`;
             document.getElementById('input-pomo').value = CONFIG.pomodoro;
             document.getElementById('input-short').value = CONFIG.short;
-            document.getElementById('input-daily-goal').value = stats.dailyFocusGoal || 120;
-            document.getElementById('toggle-auto-transition').checked = stats.autoTransition || false;
         }
         window.closeSettingsModal = function() {
             document.getElementById('settings-modal').classList.add('hidden');
@@ -2569,13 +2453,10 @@
         function saveAllSettings() {
             const inputPomo = parseInt(document.getElementById('input-pomo').value);
             const inputShort = parseInt(document.getElementById('input-short').value);
-            const inputGoal = parseInt(document.getElementById('input-daily-goal').value);
             
             if (inputPomo > 0 && inputPomo <= 180) CONFIG.pomodoro = inputPomo;
             if (inputShort > 0 && inputShort <= 60) CONFIG.short = inputShort;
-            stats.dailyFocusGoal = inputGoal;
-            stats.autoTransition = document.getElementById('toggle-auto-transition').checked;
-
+            
             localStorage.setItem('focusflow_volume', appVolume);
             localStorage.setItem('focusflow_config', JSON.stringify(CONFIG));
             
@@ -2598,15 +2479,6 @@
 
             toast.style.transform = 'translateY(0)';
             toast.style.opacity = '1';
-            
-            // Log to history
-            if (!stats.notifications) stats.notifications = [];
-            stats.notifications.push({ text, type, time: new Date().toISOString() });
-            if (stats.notifications.length > 50) stats.notifications.shift(); // Keep only 50 logs
-            
-            const notificationDot = document.getElementById('notification-dot');
-            if (notificationDot) notificationDot.classList.remove('hidden');
-            saveStatsLocal();
 
             setTimeout(() => {
                 toast.style.transform = 'translateY(80px)';
@@ -2696,7 +2568,6 @@
                 window.sessionAccumulatedSeconds = 0;
                 
                 stats.totalFocusMinutes = (stats.totalFocusMinutes || 0) + 1;
-                checkDailyQuests('minute_gain', 1);
                 
                 const today = getTodayDateString();
                 stats.dailyActivity[today] = (stats.dailyActivity[today] || 0) + 1;
@@ -2763,18 +2634,17 @@
             if (!container) return;
 
             const floatingText = document.createElement('div');
-            floatingText.className = "absolute text-xs sm:text-sm font-black text-emerald-500 pointer-events-none transition-all duration-1000 select-none z-30 will-change-transform";
+            floatingText.className = "absolute text-xs sm:text-sm font-black text-emerald-500 animate-bounce pointer-events-none transition-all duration-1000 select-none z-30";
             floatingText.style.left = `${20 + Math.random() * 60}%`;
             floatingText.style.top = `${60 + Math.random() * 20}%`;
             floatingText.textContent = text;
-            floatingText.style.transform = "translate3d(0,0,0)";
 
             container.appendChild(floatingText);
 
-            requestAnimationFrame(() => {
-                floatingText.style.transform = "translate3d(0, -120px, 0)";
+            setTimeout(() => {
+                floatingText.style.transform = "translateY(-120px)";
                 floatingText.style.opacity = "0";
-            });
+            }, 50);
 
             setTimeout(() => {
                 floatingText.remove();
@@ -2900,7 +2770,6 @@
             triggerConfettiBurst();
 
             stats.completedSessions++;
-            checkDailyQuests('session_complete', 1);
             
             const isStudyMode = (timerState.mode === 'pomodoro' || timerState.mode === 'english60' || timerState.mode === 'math120' || timerState.mode === 'continuous');
 
@@ -2978,18 +2847,6 @@
             }
 
             syncStatsCloud();
-            
-            // Auto-transition logic
-            if (stats.autoTransition) {
-                setTimeout(() => {
-                    if (timerState.mode === 'pomodoro') {
-                        setMode(stats.completedSessions % 4 === 0 ? 'long' : 'short');
-                    } else {
-                        setMode('pomodoro');
-                    }
-                    toggleTimer();
-                }, 2000);
-            }
         }
 
         let awayInterval = null;
@@ -3547,18 +3404,6 @@
             if (!stats.modeDistribution) stats.modeDistribution = { pomodoro: 0, english60: 0, math120: 0, continuous: 0 };
             if (!stats.hourlyActivity) stats.hourlyActivity = Array(24).fill(0);
             if (!stats.events) stats.events = [];
-            if (!stats.timetable) stats.timetable = Array(24).fill("");
-            if (!stats.dailyFocusGoal) stats.dailyFocusGoal = 120;
-            if (!stats.dailyQuests || stats.dailyQuests.lastUpdate !== getTodayDateString()) {
-                stats.dailyQuests = {
-                    lastUpdate: getTodayDateString(),
-                    quests: [
-                        { id: 'pomo_4', text: 'Hoàn thành 4 Pomodoro', target: 4, current: 0, reward: 200, type: 'gold', done: false },
-                        { id: 'focus_120', text: 'Học tập 120 phút', target: 120, current: 0, reward: 500, type: 'xp', done: false }
-                    ]
-                };
-            }
-            if (!stats.notifications) stats.notifications = [];
             if (!stats.level) stats.level = 1;
             if (!stats.xp) stats.xp = 0;
             if (!stats.consecutivePomos && stats.consecutivePomos !== 0) stats.consecutivePomos = 0;
@@ -3577,120 +3422,6 @@
             updateAllUI();
         }
 
-        // New Functions for Quests, Schedule and Daily Goal
-        function checkDailyQuests(actionType, value) {
-            if (!stats.dailyQuests) return;
-            stats.dailyQuests.quests.forEach(q => {
-                if (q.done) return;
-                if (actionType === 'session_complete' && q.id === 'pomo_4') q.current += value;
-                if (actionType === 'minute_gain' && q.id === 'focus_120') q.current += value;
-                if (q.current >= q.target) {
-                    q.done = true;
-                    if (q.type === 'gold') stats.gold += q.reward;
-                    if (q.type === 'xp') awardXP(q.reward);
-                    showToast(`NHIỆM VỤ HOÀN THÀNH: ${q.text}!`, "emerald");
-                }
-            });
-            renderDailyQuests();
-        }
-
-        function renderDailyQuests() {
-            const list = document.getElementById('daily-quests-list');
-            if (!list || !stats.dailyQuests) return;
-            list.innerHTML = '';
-            stats.dailyQuests.quests.forEach(q => {
-                const pct = Math.min((q.current / q.target) * 100, 100);
-                const div = document.createElement('div');
-                div.className = `p-2 rounded-xl border ${q.done ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/50' : 'bg-white dark:bg-slate-950 border-slate-100 dark:border-slate-800'}`;
-                div.innerHTML = `
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-[10px] font-bold ${q.done ? 'text-emerald-600' : 'text-slate-600 dark:text-slate-300'}">${q.text}</span>
-                        <span class="text-[9px] font-black text-slate-400">${q.current}/${q.target}</span>
-                    </div>
-                    <div class="h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div class="h-full ${q.done ? 'bg-emerald-500' : 'bg-yellow-500'} transition-all" style="width: ${pct}%"></div>
-                    </div>
-                `;
-                list.appendChild(div);
-            });
-        }
-
-        window.openScheduleModal = function() {
-            const container = document.getElementById('schedule-edit-list');
-            container.innerHTML = '';
-            for(let i=0; i<24; i++) {
-                const val = stats.timetable[i] || "";
-                container.innerHTML += `
-                    <div class="flex items-center gap-3">
-                        <span class="text-[10px] font-black text-slate-400 w-8">${i}h</span>
-                        <input type="text" value="${val}" id="sched-input-${i}" placeholder="Nhiệm vụ..." class="flex-grow bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs focus:border-indigo-500 focus:outline-none transition">
-                    </div>
-                `;
-            }
-            document.getElementById('schedule-modal').classList.remove('hidden');
-        }
-        window.closeScheduleModal = function() { document.getElementById('schedule-modal').classList.add('hidden'); }
-        window.saveSchedule = function() {
-            for(let i=0; i<24; i++) {
-                stats.timetable[i] = document.getElementById(`sched-input-${i}`).value;
-            }
-            saveStatsLocal();
-            updateScheduleUI();
-            closeScheduleModal();
-            showToast("Đã cập nhật lịch trình!", "emerald");
-        }
-
-        function updateScheduleUI() {
-            const now = new Date();
-            const hour = now.getHours();
-            document.getElementById('current-hour-display').textContent = `${String(hour).padStart(2, '0')}:00`;
-            const task = stats.timetable[hour] || "✨ Đang trong thời gian tự học tự do";
-            document.getElementById('current-schedule-task').textContent = task;
-        }
-
-        // Notification System Logic
-        window.openNotificationModal = function() {
-            document.getElementById('notification-modal').classList.remove('hidden');
-            document.getElementById('notification-dot').classList.add('hidden');
-            renderNotifications();
-        }
-        window.closeNotificationModal = function() {
-            document.getElementById('notification-modal').classList.add('hidden');
-        }
-        window.clearNotificationHistory = function() {
-            stats.notifications = [];
-            saveStatsLocal();
-            renderNotifications();
-            syncStatsCloud();
-        }
-
-        function renderNotifications() {
-            const list = document.getElementById('notification-list');
-            if (!list) return;
-            list.innerHTML = '';
-            
-            if (!stats.notifications || stats.notifications.length === 0) {
-                list.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs italic">Không có thông báo nào.</div>`;
-                return;
-            }
-
-            // Show latest first
-            [...stats.notifications].reverse().forEach(n => {
-                const item = document.createElement('div');
-                item.className = "p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 flex gap-3 items-start";
-                const timeStr = new Date(n.time).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
-                item.innerHTML = `
-                    <div class="w-2 h-2 rounded-full mt-1.5 shrink-0 ${n.type === 'red' ? 'bg-red-500' : 'bg-emerald-500'}"></div>
-                    <div>
-                        <p class="text-[11px] font-medium text-slate-700 dark:text-slate-200 leading-relaxed">${n.text}</p>
-                        <span class="text-[9px] text-slate-400 font-bold uppercase mt-1 block">${timeStr}</span>
-                    </div>
-                `;
-                list.appendChild(item);
-            });
-            lucide.createIcons({ root: list }); // Tối ưu: Chỉ quét icon trong danh sách thông báo
-        }
-
         function updateAllUI() {
             updateMotivationUI();
             generateActivityHeatmap();
@@ -3699,15 +3430,6 @@
             updateLevelsUI();
             updatePetUI();
             updateUltradianFatigueUI();
-            renderDailyQuests();
-            updateScheduleUI();
-            
-            // Daily Goal Header update
-            const todayMins = stats.dailyActivity[getTodayDateString()] || 0;
-            const goal = stats.dailyFocusGoal || 120;
-            const pct = Math.min(Math.round((todayMins / goal) * 100), 100);
-            document.getElementById('daily-goal-percent').textContent = `${pct}%`;
-            document.getElementById('daily-goal-bar').style.width = `${pct}%`;
         }
 
         // Modal triggers
