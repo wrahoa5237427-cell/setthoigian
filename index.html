@@ -1756,6 +1756,7 @@
                 lastCompletedDateString: '', 
                 dailyActivity: {}, 
                 modeDistribution: { pomodoro: 0, english60: 0, math120: 0, continuous: 0 },
+                activeBuffs: { xp: false, gold: false },
                 hourlyActivity: Array(24).fill(0),
                 activeTaskId: null,
                 events: [],
@@ -2811,7 +2812,8 @@
                 }
 
                 const minuteXp = Math.round(5 * multiplier);
-                const minuteGold = Math.round(1 * multiplier);
+                let minuteGold = Math.round(1 * multiplier);
+                if (stats.activeBuffs?.gold) minuteGold *= 2;
 
                 awardXP(minuteXp);
                 
@@ -3033,6 +3035,11 @@
             // Apply task difficulty & stress fatigue multipliers
             sessionRewardXp = Math.round(sessionRewardXp * multiplier);
             goldReward = Math.round(goldReward * multiplier);
+            
+            // Áp dụng Buff Vàng nếu có
+            if (stats.activeBuffs?.gold) {
+                goldReward *= 2;
+            }
 
             // Variable Rewards Schedule: Roll Critical Focus (15% chance for x2 Gold, x1.5 XP)
             const isCritical = Math.random() < 0.15;
@@ -3212,24 +3219,36 @@
                 stats.pet.hp = Math.min((stats.pet.hp || 0) + 20, 100);
                 showToast("Đã dùng 50 Gold để mua Dược Chất! Hồi phục +20 HP thành công!", "emerald");
                 playChime();
-            } else if (itemType === 'shield') {
-                if (stats.gold < 200) {
-                    showToast("Bạn không có đủ Focus Gold!", "red");
+            } else if (itemType === 'xp_boost') {
+                if (stats.gold < 150) {
+                    showToast("Bạn không có đủ Focus Gold để mua Cuộn Khế Ước!", "red");
                     return;
                 }
-                // [CẢI TIẾN 2] Thử thách chuộc lỗi thay vì mua thẳng
-                if (timerState.isRunning) {
-                    showToast("Vui lòng hoàn thành phiên học hiện tại để kích hoạt Chuộc Lỗi!", "amber");
+                if (stats.activeBuffs?.xp) {
+                    showToast("Bạn đã kích hoạt vật phẩm này rồi!", "amber");
                     return;
                 }
-                stats.gold -= 200;
-                stats.streak += 1;
-                showToast("Kích hoạt Khiên Bảo Vệ! Khôi phục chuỗi Streak tăng +1 thành công!", "emerald");
-                stats.streak = (stats.streak || 0) + 1;
-                showToast("Đã dùng Ấn Bản! Chuỗi Streak đã được khôi phục nhờ sự hi sinh vàng!", "emerald");
+                stats.gold -= 150;
+                if (!stats.activeBuffs) stats.activeBuffs = { xp: false, gold: false };
+                stats.activeBuffs.xp = true;
+                showToast("Kích hoạt Cuộn Khế Ước! XP sẽ được tăng x1.5 trong phiên này.", "emerald");
+                playLevelUpChime();
+            } else if (itemType === 'gold_boost') {
+                if (stats.gold < 120) {
+                    showToast("Bạn không có đủ Focus Gold để mua Nam Châm Vàng!", "red");
+                    return;
+                }
+                if (stats.activeBuffs?.gold) {
+                    showToast("Bạn đã kích hoạt vật phẩm này rồi!", "amber");
+                    return;
+                }
+                stats.gold -= 120;
+                if (!stats.activeBuffs) stats.activeBuffs = { xp: false, gold: false };
+                stats.activeBuffs.gold = true;
+                showToast("Kích hoạt Nam Châm Vàng! Vàng nhận được sẽ gấp đôi trong phiên này.", "emerald");
                 playLevelUpChime();
             }
-            
+
             saveStatsLocal();
             updatePetUI();
             updateAllUI();
