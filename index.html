@@ -647,17 +647,30 @@
                                     <span>50</span> <i data-lucide="coins" class="w-3 h-3 fill-current"></i>
                                 </button>
                             </div>
-                            <!-- Item 2: Streak Guard -->
+                            <!-- Item 2: XP Booster -->
                             <div class="flex items-center justify-between p-2 bg-slate-50/50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl text-[10px] gap-2">
                                 <div class="flex items-center gap-2 min-w-0">
-                                    <span class="text-lg shrink-0">🛡️</span>
+                                    <span class="text-lg shrink-0">📜</span>
                                     <div class="min-w-0">
-                                        <span class="font-bold text-slate-800 dark:text-slate-200 block truncate">Bảo vật Streak (+1 Streak)</span>
-                                        <span class="text-[8.5px] text-slate-400 dark:text-slate-500 block truncate">Khôi phục chuỗi ngày học tập</span>
+                                        <span class="font-bold text-slate-800 dark:text-slate-200 block truncate">Cuộn Khế Ước (XP x1.5)</span>
+                                        <span class="text-[8.5px] text-slate-400 dark:text-slate-500 block truncate">Tăng 50% XP cho phiên tới</span>
                                     </div>
                                 </div>
-                                <button onclick="buyShopItem('shield')" class="px-2.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-lg transition shrink-0 flex items-center gap-1">
-                                    <span>200</span> <i data-lucide="coins" class="w-3 h-3 fill-current"></i>
+                                <button onclick="buyShopItem('xp_boost')" class="px-2.5 py-1.5 bg-indigo-500 hover:bg-indigo-400 text-white font-extrabold rounded-lg transition shrink-0 flex items-center gap-1">
+                                    <span>150</span> <i data-lucide="coins" class="w-3 h-3 fill-current"></i>
+                                </button>
+                            </div>
+                            <!-- Item 3: Gold Magnet -->
+                            <div class="flex items-center justify-between p-2 bg-slate-50/50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl text-[10px] gap-2">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="text-lg shrink-0">🧲</span>
+                                    <div class="min-w-0">
+                                        <span class="font-bold text-slate-800 dark:text-slate-200 block truncate">Nam Châm Vàng (Gold x2)</span>
+                                        <span class="text-[8.5px] text-slate-400 dark:text-slate-500 block truncate">Nhân đôi vàng nhận được</span>
+                                    </div>
+                                </div>
+                                <button onclick="buyShopItem('gold_boost')" class="px-2.5 py-1.5 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-extrabold rounded-lg transition shrink-0 flex items-center gap-1">
+                                    <span>120</span> <i data-lucide="coins" class="w-3 h-3 fill-current"></i>
                                 </button>
                             </div>
                         </div>
@@ -1418,6 +1431,15 @@
             if (difficulty === 'hard') mult = 2.5;
 
             // Apply 50% cortisol overload brain damage penalty if they rejected Ultradian break!
+            // [CẢI TIẾN 1] Hệ số Hào quang từ Pet (Tăng 2% mỗi cấp độ Pet)
+            // Tác động của Thú cưng: Tăng 2% mỗi cấp độ
+            const petBonus = 1 + ((stats.pet?.level || 1) * 0.02);
+            mult *= petBonus;
+
+            // Tác động của Vật phẩm Buff (nếu có)
+            if (stats.activeBuffs?.xp) mult *= 1.5;
+
+            // Hình phạt mệt mỏi
             if (overloadDebuffActive) {
                 mult = mult * 0.5;
             }
@@ -2802,6 +2824,14 @@
                         stats.pet.xp -= petXpNeeded;
                         stats.pet.level = (stats.pet.level || 1) + 1;
                         showToast(`Thú cưng rèn luyện đột phá lên cấp ${stats.pet.level}!`, "emerald");
+                    
+                    // [CẢI TIẾN 5] Thưởng vàng khi Pet lên cấp
+                    // Thưởng vàng khi Pet lên cấp để tạo động lực
+                    const levelBonusGold = stats.pet.level * 50;
+                    stats.gold += levelBonusGold;
+                    
+                    showToast(`PET UP! Cấp ${stats.pet.level}. Thưởng nóng +${levelBonusGold} Vàng!`, "emerald");
+                    showToast(`PET UP! Cấp ${stats.pet.level}. Nhận thưởng +${levelBonusGold} Vàng!`, "emerald");
                         playLevelUpChime();
                     }
                 }
@@ -2965,6 +2995,13 @@
         function onTimerComplete() {
             timerState.isRunning = false;
             worker.postMessage('stop');
+            
+            // Tắt Buff sau khi hoàn thành phiên
+            if (stats.activeBuffs) {
+                stats.activeBuffs.xp = false;
+                stats.activeBuffs.gold = false;
+            }
+
             playChime();
             triggerConfettiBurst();
 
@@ -3125,6 +3162,11 @@
             const nameEl = document.getElementById('pet-name');
             if (nameEl) nameEl.textContent = petName;
 
+            // [CẢI TIẾN 1.1] Hiển thị chỉ số Hào Quang
+            const statusEl = document.getElementById('pet-status');
+            const bonusPct = (lvl * 2);
+            if (statusEl) statusEl.textContent = `Hào quang: +${bonusPct}% XP`;
+
             const hpText = document.getElementById('pet-hp-text');
             if (hpText) hpText.textContent = `${stats.pet.hp}/100`;
 
@@ -3175,9 +3217,16 @@
                     showToast("Bạn không có đủ Focus Gold!", "red");
                     return;
                 }
+                // [CẢI TIẾN 2] Thử thách chuộc lỗi thay vì mua thẳng
+                if (timerState.isRunning) {
+                    showToast("Vui lòng hoàn thành phiên học hiện tại để kích hoạt Chuộc Lỗi!", "amber");
+                    return;
+                }
                 stats.gold -= 200;
                 stats.streak += 1;
                 showToast("Kích hoạt Khiên Bảo Vệ! Khôi phục chuỗi Streak tăng +1 thành công!", "emerald");
+                stats.streak = (stats.streak || 0) + 1;
+                showToast("Đã dùng Ấn Bản! Chuỗi Streak đã được khôi phục nhờ sự hi sinh vàng!", "emerald");
                 playLevelUpChime();
             }
             
