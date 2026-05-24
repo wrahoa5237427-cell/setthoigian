@@ -3983,9 +3983,16 @@
                     syncStatusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Đã đồng bộ`;
                 }
             } catch (e) {
-                console.error("Chi tiết lỗi đồng bộ:", e); // Log ra console để dễ debug nếu có lỗi thật
+                console.error("FIREBASE SYNC ERROR:", e.code, e.message);
+                
+                let errorMsg = "Lỗi đám mây";
+                if (e.code === 'permission-denied') errorMsg = "Lỗi Rules (Bị chặn)";
+                else if (e.code === 'unavailable') errorMsg = "Mất kết nối mạng";
+                else if (e.code === 'resource-exhausted') errorMsg = "Hết hạn mức (Quota)";
+                else if (e.code === 'not-found') errorMsg = "Sai cấu hình DB";
+
                 if (syncStatusEl) {
-                    syncStatusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Lỗi đám mây`;
+                    syncStatusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> ${errorMsg}`;
                     syncStatusEl.className = "text-[8px] text-red-500 font-semibold flex items-center gap-1 mt-0.5";
                 }
             }
