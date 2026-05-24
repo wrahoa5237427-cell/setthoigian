@@ -3984,14 +3984,16 @@
                     syncStatusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Đã đồng bộ`;
                 }
             } catch (e) {
-                console.error("FIREBASE SYNC ERROR:", e.code, e.message);
-                console.error("CHI TIẾT LỖI FIREBASE:", e);
+                console.group("🔥 CHI TIẾT LỖI ĐỒNG BỘ");
+                console.error("Mã lỗi (Code):", e.code);
+                console.error("Nội dung (Message):", e.message);
+                console.groupEnd();
                 
-                let errorMsg = e.code ? `Lỗi: ${e.code}` : "Lỗi đám mây";
-                if (e.code === 'permission-denied') errorMsg = "Lỗi Rules (Bị chặn)";
-                else if (e.code === 'unavailable') errorMsg = "Mất kết nối mạng";
-                else if (e.code === 'resource-exhausted') errorMsg = "Hết hạn mức (Quota)";
-                else if (e.code === 'not-found') errorMsg = "Sai cấu hình DB";
+                // Sửa lỗi khai báo trùng let và làm gọn thông báo
+                let errorMsg = e.code ? e.code.split('/').pop() : "Lỗi kết nối";
+                if (e.code === 'permission-denied') {
+                    errorMsg = "Rules bị chặn (403)";
+                }
 
                 if (syncStatusEl) {
                     syncStatusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> ${errorMsg}`;
