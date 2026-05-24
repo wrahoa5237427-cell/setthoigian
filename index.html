@@ -3008,17 +3008,19 @@
             stats.gold = (stats.gold || 0) + goldReward;
 
             const todayStr = getTodayDateString();
-            if (stats.lastCompletedDateString !== todayStr) {
-                const lastDate = stats.lastCompletedDateString;
-                if (lastDate) {
-                    const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-                    const yesStr = yesterday.getFullYear() + '-' + String(yesterday.getMonth() + 1).padStart(2, '0') + '-' + String(yesterday.getDate()).padStart(2, '0');
-                    if (lastDate === yesStr) {
-                        stats.streak++;
-                    } else {
-                        stats.streak = 1;
-                    }
-                } else {
+            const lastDateStr = stats.lastCompletedDateString;
+
+            if (lastDateStr !== todayStr) {
+                // Tính khoảng cách ngày giữa hôm nay và ngày hoàn thành cuối cùng
+                const today = new Date(); today.setHours(0, 0, 0, 0);
+                const lastDate = parseLocalDate(lastDateStr || todayStr); lastDate.setHours(0, 0, 0, 0);
+                const diffDays = Math.round((today - lastDate) / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 1) {
+                    // Hoàn thành vào ngày kế tiếp -> Tăng streak
+                    stats.streak = (stats.streak || 0) + 1;
+                } else if (diffDays > 1 || !lastDateStr) {
+                    // Bỏ lỡ ngày hoặc lần đầu tiên học -> Reset về 1
                     stats.streak = 1;
                 }
                 stats.lastCompletedDateString = todayStr;
@@ -3657,8 +3659,24 @@
             if (localConfig) CONFIG = JSON.parse(localConfig);
 
             streakCount.textContent = stats.streak || 0;
+            refreshStreakStatus();
 
             updateAllUI();
+        }
+
+        // Hàm kiểm tra xem Streak có bị quá hạn không (Dùng khi load app)
+        function refreshStreakStatus() {
+            if (!stats.lastCompletedDateString) return;
+            
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const lastDate = parseLocalDate(stats.lastCompletedDateString); lastDate.setHours(0, 0, 0, 0);
+            
+            const diffDays = Math.round((today - lastDate) / (1000 * 60 * 60 * 24));
+            
+            if (diffDays > 1) {
+                stats.streak = 0; // Đã bỏ lỡ hơn 1 ngày -> Reset về 0
+                saveStatsLocal();
+            }
         }
 
         // New Functions for Quests, Schedule and Daily Goal
@@ -3940,7 +3958,6 @@
             }
 
             try {
-                console.log("Đang bắt đầu đồng bộ dữ liệu cho UID:", uid);
                 const statsDocRef = doc(db, 'artifacts', appId, 'users', uid, 'statistics', 'primary');
                 const tasksDocRef = doc(db, 'artifacts', appId, 'users', uid, 'tasks', 'primary');
 
@@ -3979,21 +3996,19 @@
                 saveStatsLocal();
                 saveTasksLocal();
                 updateAllUI();
+                refreshStreakStatus();
 
                 if (syncStatusEl) {
                     syncStatusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Đã đồng bộ`;
                 }
             } catch (e) {
-                console.group("🔥 CHI TIẾT LỖI ĐỒNG BỘ");
-                console.error("Mã lỗi (Code):", e.code);
-                console.error("Nội dung (Message):", e.message);
-                console.groupEnd();
+                console.error("FIREBASE SYNC ERROR:", e.code, e.message);
                 
-                // Sửa lỗi khai báo trùng let và làm gọn thông báo
-                let errorMsg = e.code ? e.code.split('/').pop() : "Lỗi kết nối";
-                if (e.code === 'permission-denied') {
-                    errorMsg = "Rules bị chặn (403)";
-                }
+                let errorMsg = "Lỗi đám mây";
+                if (e.code === 'permission-denied') errorMsg = "Lỗi Rules (Bị chặn)";
+                else if (e.code === 'unavailable') errorMsg = "Mất kết nối mạng";
+                else if (e.code === 'resource-exhausted') errorMsg = "Hết hạn mức (Quota)";
+                else if (e.code === 'not-found') errorMsg = "Sai cấu hình DB";
 
                 if (syncStatusEl) {
                     syncStatusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> ${errorMsg}`;
