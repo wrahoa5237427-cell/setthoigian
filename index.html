@@ -224,7 +224,7 @@
                 </div>
                 <div class="flex flex-col hidden sm:flex">
                     <div id="header-user-name" class="text-xs font-bold text-slate-700 dark:text-slate-200 leading-none mb-1">Chưa Đăng Nhập</div>
-                    <span class="text-[9px] text-rose-500 font-bold leading-none uppercase">Lỗi đám mây</span>
+                    <span id="header-sync-status" class="text-[9px] text-slate-400 font-bold leading-none uppercase">Đang kiểm tra...</span>
                 </div>
             </div>
 
@@ -1353,6 +1353,55 @@
         const db = getFirestore(app);
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'focusflowstudy';
+
+        // --- HỆ THỐNG KHO NHIỆM VỤ (QUEST POOL) ---
+        const QUEST_POOL = [
+            { text: "Tiểu đội tập trung", subtext: "Hoàn thành 2 Pomodoro", target: 2, reward: 150, type: 'gold', action: 'pomo' },
+            { text: "Kỷ luật sắt", subtext: "Hoàn thành 4 Pomodoro", target: 4, reward: 300, type: 'gold', action: 'pomo' },
+            { text: "Chiến binh bền bỉ", subtext: "Hoàn thành 6 Pomodoro", target: 6, reward: 500, type: 'xp', action: 'pomo' },
+            { text: "Bậc thầy Focus", subtext: "Hoàn thành 8 Pomodoro", target: 8, reward: 1000, type: 'xp', action: 'pomo' },
+            { text: "Học giả khởi đầu", subtext: "Tập trung 30 phút", target: 30, reward: 100, type: 'gold', action: 'minutes' },
+            { text: "Sâu trong kiến thức", subtext: "Tập trung 60 phút", target: 60, reward: 250, type: 'gold', action: 'minutes' },
+            { text: "Trạng thái Flow", subtext: "Tập trung 120 phút", target: 120, reward: 600, type: 'xp', action: 'minutes' },
+            { text: "Nhà thông thái", subtext: "Tập trung 180 phút", target: 180, reward: 900, type: 'xp', action: 'minutes' },
+            { text: "Thợ săn Boss", subtext: "Diệt 1 mục tiêu Hard", target: 1, reward: 400, type: 'gold', action: 'boss' },
+            { text: "Chinh phục đỉnh cao", subtext: "Diệt 2 mục tiêu Hard", target: 2, reward: 800, type: 'xp', action: 'boss' },
+            { text: "Dọn dẹp To-do", subtext: "Hoàn thành 3 nhiệm vụ", target: 3, reward: 150, type: 'gold', action: 'task' },
+            { text: "Ngày năng suất", subtext: "Hoàn thành 5 nhiệm vụ", target: 5, reward: 350, type: 'xp', action: 'task' }
+        ];
+
+        // Tự động tạo thêm biến thể để đạt ~60 nhiệm vụ
+        for (let i = 1; i <= 20; i++) {
+            QUEST_POOL.push({
+                text: `Thử thách tập trung ${i}`,
+                subtext: `Tích lũy ${15 * i} phút học tập`,
+                target: 15 * i,
+                reward: 20 * i,
+                type: i % 2 === 0 ? 'gold' : 'xp',
+                action: 'minutes'
+            });
+            QUEST_POOL.push({
+                text: `Rèn luyện cấp độ ${i}`,
+                subtext: `Hoàn thành ${Math.ceil(i/3)} phiên Pomo`,
+                target: Math.ceil(i/3),
+                reward: 40 * i,
+                type: i % 2 === 0 ? 'xp' : 'gold',
+                action: 'pomo'
+            });
+        }
+
+        function generateDailyQuests(count = 4) {
+            const shuffled = [...QUEST_POOL].sort(() => 0.5 - Math.random());
+            return {
+                lastUpdate: getTodayDateString(),
+                quests: shuffled.slice(0, count).map(q => ({
+                    ...q,
+                    id: 'q_' + Math.random().toString(36).substr(2, 9),
+                    current: 0,
+                    done: false
+                }))
+            };
+        }
 
         let activeAuthView = 'login'; 
 
@@ -2920,7 +2969,7 @@
             triggerConfettiBurst();
 
             stats.completedSessions++;
-            checkDailyQuests('session_complete', 1);
+            checkDailyQuests('pomo', 1);
             
             const isStudyMode = (timerState.mode === 'pomodoro' || timerState.mode === 'english60' || timerState.mode === 'math120' || timerState.mode === 'continuous');
 
@@ -3365,8 +3414,13 @@
             const task = tasks.find(t => t.id === id);
             if (task) {
                 task.completed = !task.completed;
-                if (task.completed && stats.activeTaskId === id) {
-                    stats.activeTaskId = null; 
+                if (task.completed) {
+                    checkDailyQuests('task', 1);
+                    if (task.difficulty === 'hard') checkDailyQuests('boss', 1);
+                    
+                    if (stats.activeTaskId === id) {
+                        stats.activeTaskId = null; 
+                    }
                 }
                 saveTasksLocal();
                 saveStatsLocal();
@@ -3569,15 +3623,11 @@
             if (!stats.events) stats.events = [];
             if (!stats.timetable) stats.timetable = Array(24).fill("");
             if (!stats.dailyFocusGoal) stats.dailyFocusGoal = 120;
+            
             if (!stats.dailyQuests || stats.dailyQuests.lastUpdate !== getTodayDateString()) {
-                stats.dailyQuests = {
-                    lastUpdate: getTodayDateString(),
-                    quests: [
-                        { id: 'pomo_4', text: 'Hoàn thành 4 Pomodoro', target: 4, current: 0, reward: 200, type: 'gold', done: false },
-                        { id: 'focus_120', text: 'Học tập 120 phút', target: 120, current: 0, reward: 500, type: 'xp', done: false }
-                    ]
-                };
+                stats.dailyQuests = generateDailyQuests(4);
             }
+
             if (!stats.notifications) stats.notifications = [];
             if (!stats.level) stats.level = 1;
             if (!stats.xp) stats.xp = 0;
@@ -3597,24 +3647,10 @@
                     t.completed = false; // Bỏ đánh dấu hoàn thành để làm lại vào ngày mới
                 });
                 stats.lastResetDate = today;
-                stats.dailyQuests = {
-                    lastUpdate: today,
-                    quests: [
-                        { id: 'pomo_4', text: 'Hoàn thành 4 Pomodoro', target: 4, current: 0, reward: 200, type: 'gold', done: false },
-                        { id: 'focus_120', text: 'Học tập 120 phút', target: 120, current: 0, reward: 500, type: 'xp', done: false }
-                    ]
-                };
+                stats.dailyQuests = generateDailyQuests(4);
                 stats.consecutivePomos = 0; // Reset độ mệt mỏi não bộ đầu ngày
                 saveTasksLocal();
                 saveStatsLocal();
-            } else if (!stats.dailyQuests) {
-                stats.dailyQuests = {
-                    lastUpdate: today,
-                    quests: [
-                        { id: 'pomo_4', text: 'Hoàn thành 4 Pomodoro', target: 4, current: 0, reward: 200, type: 'gold', done: false },
-                        { id: 'focus_120', text: 'Học tập 120 phút', target: 120, current: 0, reward: 500, type: 'xp', done: false }
-                    ]
-                };
             }
 
             if (localVol) appVolume = parseInt(localVol);
@@ -3630,8 +3666,7 @@
             if (!stats.dailyQuests) return;
             stats.dailyQuests.quests.forEach(q => {
                 if (q.done) return;
-                if (actionType === 'session_complete' && q.id === 'pomo_4') q.current += value;
-                if (actionType === 'minute_gain' && q.id === 'focus_120') q.current += value;
+                if (q.action === actionType) q.current += value;
                 if (q.current >= q.target) {
                     q.done = true;
                     if (q.type === 'gold') stats.gold += q.reward;
@@ -3647,16 +3682,29 @@
             if (!list || !stats.dailyQuests) return;
             list.innerHTML = '';
             stats.dailyQuests.quests.forEach(q => {
+                let icon = 'zap';
+                if (q.action === 'minutes') icon = 'clock';
+                if (q.action === 'boss') icon = 'swords';
+                if (q.action === 'task') icon = 'check-square';
+
                 const pct = Math.min((q.current / q.target) * 100, 100);
                 const div = document.createElement('div');
-                div.className = `p-2 rounded-xl border ${q.done ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/50' : 'bg-white dark:bg-slate-950 border-slate-100 dark:border-slate-800'}`;
+                div.className = `p-3 rounded-xl border transition-all ${q.done ? 'bg-emerald-50/30 dark:bg-emerald-950/20 border-emerald-200/50 opacity-75' : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 shadow-sm'}`;
                 div.innerHTML = `
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-[10px] font-bold ${q.done ? 'text-emerald-600' : 'text-slate-600 dark:text-slate-300'}">${q.text}</span>
-                        <span class="text-[9px] font-black text-slate-400">${q.current}/${q.target}</span>
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-1.5 rounded-lg ${q.done ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}">
+                            <i data-lucide="${icon}" class="w-3.5 h-3.5"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex justify-between items-center mb-0.5">
+                                <span class="text-[11px] font-black ${q.done ? 'text-emerald-600' : 'text-slate-700 dark:text-slate-200'} uppercase tracking-tight">${q.text}</span>
+                                <span class="text-[10px] font-black ${q.done ? 'text-emerald-500' : 'text-slate-400'}">${q.current}/${q.target}</span>
+                            </div>
+                            <p class="text-[9px] text-slate-400 dark:text-slate-500 font-bold">${q.subtext} • Thưởng: +${q.reward} ${q.type.toUpperCase()}</p>
+                        </div>
                     </div>
-                    <div class="h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div class="h-full ${q.done ? 'bg-emerald-500' : 'bg-yellow-500'} transition-all" style="width: ${pct}%"></div>
+                    <div class="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner">
+                        <div class="h-full ${q.done ? 'bg-emerald-500' : 'bg-indigo-500'} transition-all duration-500" style="width: ${pct}%"></div>
                     </div>
                 `;
                 list.appendChild(div);
@@ -3924,13 +3972,7 @@
                 if (stats.lastResetDate !== today) {
                     tasks.forEach(t => { t.focusMinutes = 0; t.completed = false; });
                     stats.lastResetDate = today;
-                    stats.dailyQuests = {
-                        lastUpdate: today,
-                        quests: [
-                            { id: 'pomo_4', text: 'Hoàn thành 4 Pomodoro', target: 4, current: 0, reward: 200, type: 'gold', done: false },
-                            { id: 'focus_120', text: 'Học tập 120 phút', target: 120, current: 0, reward: 500, type: 'xp', done: false }
-                        ]
-                    };
+                    stats.dailyQuests = generateDailyQuests(4);
                 }
 
                 saveStatsLocal();
